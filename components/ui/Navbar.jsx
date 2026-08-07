@@ -1,21 +1,34 @@
 'use client';
 
+/**
+ * Navbar — Floating Studio Navbar with Dynamic Multi-Sport Theme Support.
+ *
+ * Theme Modes:
+ * - 'green' (Hero & Futsal): Green logo mark (#3CCB6E), green CTA hover (#123D27 + #3CCB6E border).
+ * - 'orange' (Basketball): Electric Orange logo mark (#FF5500), electric orange CTA hover (#3A1200 + #FF5500 border).
+ */
+
 import React, { useState } from 'react';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
-  { label: 'Futsal',      href: '#facilities-overview' },
-  { label: 'Basketball',  href: '#facilities-overview' },
-  { label: 'Gym Hall',    href: '#facilities-overview' },
-  { label: 'Badminton',   href: '#facilities-overview' },
-  { label: 'About',       href: '#about' },
+  { label: 'Futsal',      href: '#futsal-section' },
+  { label: 'Basketball',  href: '#basketball-section' },
+  { label: 'Gym Hall',    href: '#basketball-section' },
+  { label: 'Badminton',   href: '#futsal-section' },
+  { label: 'About',       href: '#hero-section' },
 ];
 
-export default function Navbar({ onBookNow }) {
+export default function Navbar({ onBookNow, theme = 'green' }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const isOrange = theme === 'orange';
+
+  const accentColor = isOrange ? '#FF5500' : '#3CCB6E';
+  const ctaHoverBg  = isOrange ? 'hover:bg-[#3A1200] hover:border-[#FF5500]/50 hover:text-[#FF5500]' : 'hover:bg-[#123D27] hover:border-[#3CCB6E]/50 hover:text-[#3CCB6E]';
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0B0D]/90 backdrop-blur-md border-b border-[#1A1D1C]">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0B0D]/90 backdrop-blur-md border-b border-[#1A1D1C] transition-colors duration-500">
       <nav
         aria-label="Main navigation"
         className="max-w-[1440px] mx-auto flex items-center justify-between px-6 sm:px-10 h-14"
@@ -26,10 +39,11 @@ export default function Navbar({ onBookNow }) {
           className="flex items-center gap-2 shrink-0 group focus:outline-none"
           aria-label="Miteri Sports Center"
         >
-          {/* Snowflake-style mark */}
+          {/* Dynamic Snowflake / Star mark */}
           <svg
             width="18" height="18" viewBox="0 0 24 24" fill="none"
-            className="text-[#39D477]"
+            style={{ color: accentColor }}
+            className="transition-colors duration-500"
             aria-hidden="true"
           >
             <line x1="12" y1="2"  x2="12" y2="22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -38,7 +52,8 @@ export default function Navbar({ onBookNow }) {
             <line x1="19.07" y1="4.93" x2="4.93" y2="19.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
           <span
-            className="font-stedelijk text-[15px] tracking-tight text-[#F4F4F0] group-hover:text-[#39D477] transition-colors duration-200"
+            style={{ '--hover-color': accentColor }}
+            className="font-stedelijk text-[15px] tracking-tight text-[#F4F4F0] transition-colors duration-300"
           >
             Miteri
           </span>
@@ -62,7 +77,7 @@ export default function Navbar({ onBookNow }) {
         <div className="flex items-center gap-4">
           <button
             onClick={onBookNow}
-            className="hidden md:flex items-center gap-1.5 text-[13px] font-sans text-[#F4F4F0] bg-[#1A1D1C] hover:bg-[#123D27] border border-[#1A1D1C] hover:border-[#39D477]/40 px-4 py-1.5 rounded-full transition-all duration-200"
+            className={`hidden md:flex items-center gap-1.5 text-[13px] font-sans text-[#F4F4F0] bg-[#1A1D1C] border border-[#1A1D1C] ${ctaHoverBg} px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer`}
           >
             Book a Court
           </button>
@@ -70,7 +85,8 @@ export default function Navbar({ onBookNow }) {
           {/* Mobile "Book" always visible */}
           <button
             onClick={onBookNow}
-            className="md:hidden text-[12px] font-medium text-[#39D477] font-sans"
+            style={{ color: accentColor }}
+            className="md:hidden text-[12px] font-medium font-sans transition-colors duration-500"
           >
             Book
           </button>
@@ -101,7 +117,8 @@ export default function Navbar({ onBookNow }) {
           ))}
           <button
             onClick={() => { onBookNow?.(); setMobileOpen(false); }}
-            className="mt-2 w-full text-center bg-[#39D477] text-[#0A0B0D] text-[13px] font-semibold font-sans py-2 rounded-full"
+            style={{ backgroundColor: accentColor }}
+            className="mt-2 w-full text-center text-[#0A0B0D] text-[13px] font-semibold font-sans py-2 rounded-full transition-colors duration-500"
           >
             Book a Court
           </button>

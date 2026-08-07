@@ -18,10 +18,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body
-        className="min-h-full flex flex-col bg-[#080909] text-[#F4F4F0] font-sans antialiased"
-        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-      >
+      <body className="min-h-full flex flex-col bg-[#080909] text-[#F4F4F0] font-sans antialiased">
         <LenisProvider>{children}</LenisProvider>
       </body>
     </html>

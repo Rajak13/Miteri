@@ -1,7 +1,12 @@
 'use client';
 
 /**
- * Football — Studio 3D Football Mesh with Additive Mouse Drag Rotation Layer & Visibility Controls.
+ * Basketball — Studio 3D Basketball Mesh with Centered Geometry Raycasting & Additive Mouse Drag.
+ *
+ * Raycasting & Interaction Fix:
+ * Extracts standaloneMesh directly from GLTF geometry, centers geometry bounding box, and computes
+ * vertex normals so R3F raycasting recognizes mouse hover (hand grab cursor) and drag interactions
+ * 100% identically to Football.jsx.
  */
 
 import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback } from 'react';
@@ -11,7 +16,7 @@ import * as THREE from 'three';
 
 const SCENE_BALL_RADIUS = 0.62;
 
-export const Football = forwardRef(function Football(
+export const Basketball = forwardRef(function Basketball(
   { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true },
   ref
 ) {
@@ -19,14 +24,13 @@ export const Football = forwardRef(function Football(
   const innerRef = useRef();
   const meshRef  = useRef();
 
-  const { scene }          = useGLTF('/models/football.glb');
+  const { scene }          = useGLTF('/models/basketball.glb');
   const { invalidate, gl } = useThree();
 
-  const isDragging      = useRef(false);
-  const prevMouse       = useRef({ x: 0, y: 0 });
-  const angVel          = useRef({ x: 0, y: 0 });
-  const isCoasting      = useRef(false);
-  const squashTimer     = useRef(0);
+  const isDragging = useRef(false);
+  const prevMouse  = useRef({ x: 0, y: 0 });
+  const angVel     = useRef({ x: 0, y: 0 });
+  const isCoasting = useRef(false);
 
   const dragRotationRef = useRef({ x: 0, y: 0 });
   const baseRotationRef = useRef({ x: 0, y: Math.PI, z: 0 });
@@ -41,21 +45,7 @@ export const Football = forwardRef(function Football(
     innerRef.current.rotation.set(base.x + drag.x, base.y + drag.y, base.z);
   }, []);
 
-  useFrame((state, delta) => {
-    if (squashTimer.current > 0) {
-      squashTimer.current -= delta;
-      if (squashTimer.current <= 0) {
-        squashTimer.current = 0;
-        if (meshRef.current) meshRef.current.scale.set(1, 1, 1);
-      } else {
-        const p = squashTimer.current / 0.12;
-        const sy = 0.86 + (1 - 0.86) * (1 - p);
-        const sx = 1.14 - (1.14 - 1) * (1 - p);
-        if (meshRef.current) meshRef.current.scale.set(sx, sy, sx);
-      }
-      invalidate();
-    }
-
+  useFrame(() => {
     if (!isCoasting.current || isDragging.current) return;
 
     const speed = Math.sqrt(angVel.current.x ** 2 + angVel.current.y ** 2);
@@ -119,7 +109,8 @@ export const Football = forwardRef(function Football(
     window.addEventListener('pointerup',   onUp,   { passive: false });
   }, [gl, invalidate, updateCombinedRotation]);
 
-  const onPointerEnter = useCallback(() => {
+  const onPointerEnter = useCallback((e) => {
+    e.stopPropagation();
     gl.domElement.style.cursor = 'grab';
   }, [gl]);
 
@@ -127,6 +118,7 @@ export const Football = forwardRef(function Football(
     if (!isDragging.current) gl.domElement.style.cursor = '';
   }, [gl]);
 
+  // Extract single centered mesh for 100% accurate R3F raycasting
   const { standaloneMesh, baseScale, materialsRef } = useMemo(() => {
     let rawMesh = null;
     scene.traverse((child) => {
@@ -152,14 +144,17 @@ export const Football = forwardRef(function Football(
     const size = new THREE.Vector3();
     geom.boundingBox.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z);
-    const normScale = (SCENE_BALL_RADIUS * 2) / maxDim;
+    const normScale = (SCENE_BALL_RADIUS * 2) / (maxDim || 1);
 
     const mat = rawMesh.material ? rawMesh.material.clone() : new THREE.MeshStandardMaterial();
-    mat.envMapIntensity = 2.4;
-    mat.roughness       = 0.26;
-    mat.metalness       = 0.16;
-    mat.transparent     = opacity < 0.99;
-    mat.opacity         = opacity;
+    mat.emissiveMap = null;
+    mat.emissive = new THREE.Color(0x000000);
+    mat.emissiveIntensity = 0.0;
+    mat.depthWrite = true;
+    mat.transparent = opacity < 0.99;
+    mat.opacity = opacity;
+    mat.roughness = 0.38;
+    mat.metalness = 0.08;
 
     const mesh = new THREE.Mesh(geom, mat);
     return { standaloneMesh: mesh, baseScale: normScale, materialsRef: [mat] };
@@ -183,12 +178,7 @@ export const Football = forwardRef(function Football(
         groupRef.current.visible = vis;
       }
     },
-    triggerKickImpulse: () => {
-      squashTimer.current = 0.12;
-      if (meshRef.current) meshRef.current.scale.set(1.14, 0.86, 1.14);
-      invalidate();
-    },
-  }), [invalidate, updateCombinedRotation, materialsRef]);
+  }), [materialsRef, updateCombinedRotation]);
 
   return (
     <group
@@ -207,5 +197,5 @@ export const Football = forwardRef(function Football(
   );
 });
 
-useGLTF.preload('/models/football.glb');
-export default Football;
+useGLTF.preload('/models/basketball.glb');
+export default Basketball;
