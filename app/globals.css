@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/* ─── HUMANE — ultra-condensed display grotesque ───────────────── */
+@font-face {
+  font-family: 'Humane';
+  src: url('/fonts/Humane-Regular.woff2') format('woff2'),
+       url('/fonts/Humane-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Humane';
+  src: url('/fonts/Humane-Bold.woff2') format('woff2'),
+       url('/fonts/Humane-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Humane';
+  src: url('/fonts/Humane-SemiBold.woff2') format('woff2'),
+       url('/fonts/Humane-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Humane';
+  src: url('/fonts/Humane-Light.woff2') format('woff2'),
+       url('/fonts/Humane-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Humane';
+  src: url('/fonts/Humane-ExtraLight.woff2') format('woff2'),
+       url('/fonts/Humane-ExtraLight.woff') format('woff');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Humane';
+  src: url('/fonts/Humane-Thin.woff2') format('woff2'),
+       url('/fonts/Humane-Thin.woff') format('woff');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── ARCHITYPE STEDELIJK — geometric editorial display ────────── */
+@font-face {
+  font-family: 'Architype Stedelijk';
+  src: url('/fonts/Architype Stedelijk W00.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── ROXBOROUGH CF — editorial serif ─────────────────────────── */
+@font-face {
+  font-family: 'Roxborough CF';
+  src: url('/fonts/roxborough-cf-regular.woff2') format('woff2'),
+       url('/fonts/roxborough-cf-regular.eot') format('embedded-opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── DESIGN TOKENS ────────────────────────────────────────────── */
+:root {
+  --bg:          #0A0B0D;   /* obsidian dark carbon              */
+  --bg-off:      #141619;   /* slightly elevated surface          */
+  --ink:         #F4F4F0;   /* primary off-white text            */
+  --ink-muted:   #85878A;   /* secondary slate grey text         */
+  --ink-faint:   #505459;   /* faint captions, borders           */
+  --accent:      #39D477;   /* vivid kinetic green               */
+  --deep-green:  #123D27;   /* deep emerald container            */
+  --surface:     #1A1D1C;   /* dark card surface                 */
+  --white-obj:   #EDEDEA;   /* warm white objects                */
+  --border:      rgba(255, 255, 255, 0.08);
+}
+
+@theme inline {
+  --color-background:   var(--bg);
+  --color-foreground:   var(--ink);
+  --font-display:       'Humane', sans-serif;
+  --font-stedelijk:     'Architype Stedelijk', sans-serif;
+  --font-serif:         'Roxborough CF', Georgia, serif;
+  --font-mono:          'Space Mono', monospace;
+}
+
+/* ─── UTILITY CLASSES ──────────────────────────────────────────── */
+.font-stedelijk  { font-family: 'Architype Stedelijk', sans-serif; }
+.font-roxborough { font-family: 'Roxborough CF', Georgia, serif; }
+.font-humane     { font-family: 'Humane', sans-serif; }
+
+/* ─── GLOBAL BASE ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  background-color: #0A0B0D;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── HORIZONTAL RULE ───────────────────────────────────────────── */
+.rule { border-color: var(--border); }
+
+/* ─── STAGGER ANIMATION CLASSES ─────────────────────────────────── */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-fade-in {
+  animation: fade-in 0.6s ease both;
+}
+
+/* ─── MITERI NAVBAR BORDER ──────────────────────────────────────── */
+.nav-border {
+  border-bottom: 1px solid var(--border);
+}
