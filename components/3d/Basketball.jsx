@@ -14,7 +14,7 @@ import { useGLTF } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const SCENE_BALL_RADIUS = 0.62;
+const SCENE_BALL_RADIUS = 0.54;
 
 export const Basketball = forwardRef(function Basketball(
   { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true },
@@ -109,8 +109,7 @@ export const Basketball = forwardRef(function Basketball(
     window.addEventListener('pointerup',   onUp,   { passive: false });
   }, [gl, invalidate, updateCombinedRotation]);
 
-  const onPointerEnter = useCallback((e) => {
-    e.stopPropagation();
+  const onPointerEnter = useCallback(() => {
     gl.domElement.style.cursor = 'grab';
   }, [gl]);
 
@@ -118,46 +117,49 @@ export const Basketball = forwardRef(function Basketball(
     if (!isDragging.current) gl.domElement.style.cursor = '';
   }, [gl]);
 
-  // Extract single centered mesh for 100% accurate R3F raycasting
-  const { standaloneMesh, baseScale, materialsRef } = useMemo(() => {
-    let rawMesh = null;
-    scene.traverse((child) => {
-      if (child.isMesh && !rawMesh) {
-        rawMesh = child;
-      }
-    });
+  const { standaloneObject, baseScale, materialsRef } = useMemo(() => {
+    const clonedScene = scene.clone(true);
 
-    if (!rawMesh) {
-      return { standaloneMesh: new THREE.Mesh(), baseScale: 1, materialsRef: [] };
-    }
-
-    const geom = rawMesh.geometry.clone();
-    geom.computeBoundingBox();
-    const box = geom.boundingBox;
+    const box = new THREE.Box3().setFromObject(clonedScene);
     const center = new THREE.Vector3();
     box.getCenter(center);
 
-    geom.translate(-center.x, -center.y, -center.z);
-    geom.computeBoundingBox();
-    geom.computeVertexNormals();
+    clonedScene.position.set(-center.x, -center.y, -center.z);
+
+    const wrapper = new THREE.Group();
+    wrapper.add(clonedScene);
 
     const size = new THREE.Vector3();
-    geom.boundingBox.getSize(size);
+    box.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z);
     const normScale = (SCENE_BALL_RADIUS * 2) / (maxDim || 1);
 
-    const mat = rawMesh.material ? rawMesh.material.clone() : new THREE.MeshStandardMaterial();
-    mat.emissiveMap = null;
-    mat.emissive = new THREE.Color(0x000000);
-    mat.emissiveIntensity = 0.0;
-    mat.depthWrite = true;
-    mat.transparent = opacity < 0.99;
-    mat.opacity = opacity;
-    mat.roughness = 0.38;
-    mat.metalness = 0.08;
+    const mats = [];
+    clonedScene.traverse((child) => {
+      if (child.isMesh) {
+        if (Array.isArray(child.material)) {
+          child.material = child.material.map((m) => {
+            const mat = m.clone();
+            mat.roughness   = 0.38;
+            mat.metalness   = 0.08;
+            mat.transparent = opacity < 0.99;
+            mat.opacity     = opacity;
+            mats.push(mat);
+            return mat;
+          });
+        } else if (child.material) {
+          const mat = child.material.clone();
+          mat.roughness   = 0.38;
+          mat.metalness   = 0.08;
+          mat.transparent = opacity < 0.99;
+          mat.opacity     = opacity;
+          child.material  = mat;
+          mats.push(mat);
+        }
+      }
+    });
 
-    const mesh = new THREE.Mesh(geom, mat);
-    return { standaloneMesh: mesh, baseScale: normScale, materialsRef: [mat] };
+    return { standaloneObject: wrapper, baseScale: normScale, materialsRef: mats };
   }, [scene, opacity]);
 
   useImperativeHandle(ref, () => ({
@@ -190,7 +192,7 @@ export const Basketball = forwardRef(function Basketball(
     >
       <group ref={innerRef} position={[0, 0, 0]} rotation={[0, Math.PI, 0]}>
         <group ref={meshRef}>
-          <primitive object={standaloneMesh} scale={baseScale * scale} />
+          <primitive object={standaloneObject} scale={baseScale * scale} />
         </group>
       </group>
     </group>

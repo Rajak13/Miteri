@@ -24,7 +24,7 @@ if (typeof window !== 'undefined') {
 
 // ── AUTHORED IMMUTABLE TRANSFORM DESIGN CONSTANTS (DESKTOP) ───────────────────
 export const HERO_BALL_TRANSFORM = {
-  position: [0.80, 0.08, 0.00],
+  position: [0.00, 0.05, 0.00],
   rotation: [0, Math.PI, 0],
 };
 
@@ -56,10 +56,10 @@ export const BASKETBALL_BALL_TRANSFORM_MOBILE = {
 
 // ── AUTHORED 3D CATMULL-ROM SPLINE TRAJECTORIES (DESKTOP) ─────────────────────
 export const HERO_FUTSAL_SPLINE = new THREE.CatmullRomCurve3([
-  new THREE.Vector3(...HERO_BALL_TRANSFORM.position),  // Point 0: [ 0.80,  0.08, 0.00] (Exact Start)
-  new THREE.Vector3( 0.25, -0.06,  0.22),             // Point 1: Authored mid-arc Y & Z-depth pop
-  new THREE.Vector3(-0.45, +0.05, +0.18),             // Point 2: Subtle rightward curve as Futsal enters
-  new THREE.Vector3(...FUTSAL_BALL_TRANSFORM.position) // Point 3: [-1.15,  0.00, 0.00] (Exact End)
+  new THREE.Vector3(...HERO_BALL_TRANSFORM.position),  // Point 0: [ 0.00,  0.05, 0.00] (Center)
+  new THREE.Vector3(-0.35, -0.06,  0.22),             // Point 1: Authored mid-arc Y & Z-depth pop
+  new THREE.Vector3(-0.75, +0.05, +0.18),             // Point 2: Leftward sweep into Futsal
+  new THREE.Vector3(...FUTSAL_BALL_TRANSFORM.position) // Point 3: [-1.15,  0.00, 0.00] (Futsal left)
 ], false, 'catmullrom', 0.25);
 
 export const FUTSAL_BASKETBALL_SPLINE = new THREE.CatmullRomCurve3([
@@ -100,7 +100,7 @@ function CameraPortalController({
   const { camera, invalidate } = useThree();
   const isMobile = useIsMobile();
 
-  const baseZ = isMobile ? 6.2 : 3.9;
+  const baseZ = isMobile ? 6.2 : 4.4;
 
   useFrame(() => {
     if (!progressRef) return;
@@ -247,60 +247,95 @@ function CameraPortalController({
 }
 
 function DynamicRadialShadow({ hasKicked, progressRef, futsalProgressRef, basketballProgressRef }) {
-  const isMobile = useIsMobile();
-  const meshRef  = useRef();
+  const isMobile    = useIsMobile();
+  const groupRef    = useRef();
+  const greenMatRef = useRef();
+  const orangeMatRef= useRef();
 
-  const shadowTexture = useMemo(() => {
+  // Green shadow texture
+  const greenTex = useMemo(() => {
     if (typeof document === 'undefined') return null;
-    const c   = document.createElement('canvas');
-    c.width   = 64;
-    c.height  = 64;
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
     const ctx = c.getContext('2d');
-    const g   = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    g.addColorStop(0.0, 'rgba(0, 0, 0, 0.65)');
-    g.addColorStop(0.5, 'rgba(0, 0, 0, 0.25)');
-    g.addColorStop(1.0, 'rgba(0, 0, 0, 0.00)');
+    const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0.0,  'rgba(0, 158, 84, 1.0)');
+    g.addColorStop(0.30, 'rgba(0, 158, 84, 0.45)');
+    g.addColorStop(0.60, 'rgba(0, 0, 0, 0.50)');
+    g.addColorStop(1.0,  'rgba(0, 0, 0, 0.00)');
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 64, 64);
+    ctx.fillRect(0, 0, 128, 128);
+    const tex = new THREE.CanvasTexture(c);
+    tex.needsUpdate = true;
+    return tex;
+  }, []);
+
+  // Orange shadow texture
+  const orangeTex = useMemo(() => {
+    if (typeof document === 'undefined') return null;
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0.0,  'rgba(255, 85, 0, 1.0)');
+    g.addColorStop(0.30, 'rgba(255, 85, 0, 0.45)');
+    g.addColorStop(0.60, 'rgba(0, 0, 0, 0.50)');
+    g.addColorStop(1.0,  'rgba(0, 0, 0, 0.00)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 128, 128);
     const tex = new THREE.CanvasTexture(c);
     tex.needsUpdate = true;
     return tex;
   }, []);
 
   useFrame(() => {
-    if (!meshRef.current) return;
-    const p = progressRef?.current || 0;
-    const fp = Math.min(Math.max(futsalProgressRef?.current || 0, 0.0), 1.0);
-    const bsp = Math.min(Math.max(basketballProgressRef?.current || 0, 0.0), 1.0);
+    if (!groupRef.current) return;
+    const p   = progressRef?.current || 0;
+    const fp  = Math.min(Math.max(futsalProgressRef?.current    || 0, 0), 1);
+    const bsp = Math.min(Math.max(basketballProgressRef?.current || 0, 0), 1);
     const settleProgress = Math.max(0, (p - 0.65) / 0.35);
+
+    // --- Position ---
+    let posX = 0;
+    let posY = isMobile ? -0.48 : -0.72;
 
     if (bsp > 0.001) {
       const futsalShadowX = isMobile ? FUTSAL_BALL_TRANSFORM_MOBILE.position[0] : FUTSAL_BALL_TRANSFORM.position[0];
-      const bballShadowX  = isMobile ? BASKETBALL_BALL_TRANSFORM_MOBILE.position[0]  : BASKETBALL_BALL_TRANSFORM.position[0];
-      const futsalShadowY = isMobile ? 0.15 : -0.35;
-      const bballShadowY  = isMobile ? 0.15 : -0.35;
-      meshRef.current.position.x = futsalShadowX + (bballShadowX - futsalShadowX) * bsp;
-      meshRef.current.position.y = futsalShadowY + (bballShadowY - futsalShadowY) * bsp;
+      const bballShadowX  = isMobile ? BASKETBALL_BALL_TRANSFORM_MOBILE.position[0] : BASKETBALL_BALL_TRANSFORM.position[0];
+      posX = futsalShadowX + (bballShadowX - futsalShadowX) * bsp;
+      posY = isMobile ? 0.15 : -0.72;
     } else {
       const heroX = hasKicked ? (isMobile ? 0.00 : HERO_BALL_TRANSFORM.position[0] * settleProgress) : 0.00;
-      const heroY = hasKicked ? (isMobile ? -0.48 : -0.45 + (0.23 * settleProgress)) : (isMobile ? -0.48 : -0.45);
-
+      const heroY = isMobile ? -0.48 : -0.72;
       const futsalShadowX = isMobile ? FUTSAL_BALL_TRANSFORM_MOBILE.position[0] : FUTSAL_BALL_TRANSFORM.position[0];
-      const futsalShadowY = isMobile ? 0.15 : -0.35;
-
-      meshRef.current.position.x = heroX + (futsalShadowX - heroX) * fp;
-      meshRef.current.position.y = heroY + (futsalShadowY - heroY) * fp;
+      posX = heroX + (futsalShadowX - heroX) * fp;
+      posY = heroY + ((isMobile ? 0.15 : -0.72) - heroY) * fp;
     }
+
+    groupRef.current.position.x = posX;
+    groupRef.current.position.y = posY;
+
+    // --- Blend green → orange by bsp ---
+    if (greenMatRef.current)  greenMatRef.current.opacity  = 0.50 * (1 - bsp);
+    if (orangeMatRef.current) orangeMatRef.current.opacity = 0.50 * bsp;
   });
 
-  if (!shadowTexture) return null;
-  const shadowSize = isMobile ? 2.6 : 2.4;
+  if (!greenTex || !orangeTex) return null;
+  const shadowSize = isMobile ? 2.6 : 2.8;
 
   return (
-    <mesh ref={meshRef} position={[0, -0.45, 0]} rotation-x={-Math.PI / 2}>
-      <planeGeometry args={[shadowSize, shadowSize]} />
-      <meshBasicMaterial map={shadowTexture} transparent depthWrite={false} opacity={0.45} />
-    </mesh>
+    <group ref={groupRef} position={[0, -0.72, 0]} rotation-x={-Math.PI / 2}>
+      {/* Green glow — fades out as basketball section enters */}
+      <mesh>
+        <planeGeometry args={[shadowSize, shadowSize]} />
+        <meshBasicMaterial ref={greenMatRef}  map={greenTex}  transparent depthWrite={false} opacity={0.50} />
+      </mesh>
+      {/* Orange glow — fades in as basketball section enters */}
+      <mesh>
+        <planeGeometry args={[shadowSize, shadowSize]} />
+        <meshBasicMaterial ref={orangeMatRef} map={orangeTex} transparent depthWrite={false} opacity={0.00} />
+      </mesh>
+    </group>
   );
 }
 
@@ -451,26 +486,28 @@ export default function HeroCanvas({
         basketballProgressRef={basketballProgressRef}
       />
 
-      {/* Direct Studio Lighting Rig */}
-      <ambientLight intensity={0.8} color="#FFFFFF" />
+      {/* Lighting Rig — tuned for lighting coherence with CSS environment layers:
+           Ambient reduced to 0.35 so the key/rim/fill directionals cast real shadows.
+           Key light: upper-left [-3.5,5,4] — bright highlight on upper-left face
+           Rim A: rear-right [4,2,-3]  — emerald edge on ball's right silhouette
+           Rim B: rear-left [-4,2,-3]  — orange edge on ball's left (basketball phase)
+           Fill: lower-right [3.5,-2,2] — prevents right side going pure black  */}
+      <ambientLight intensity={0.35} color="#FFFFFF" />
 
-      {/* 1. Key Light: Upper-left cool-white */}
+      {/* Key Light: Upper-left cool-white — the primary source */}
       <directionalLight position={[-3.5, 5.0, 4.0]} intensity={5.5} color="#F8FAFC" />
 
-      {/* 2. Fill Light: Lower-right soft fill */}
-      <directionalLight position={[3.5, -2.0, 2.0]} intensity={2.0} color="#D9E2EC" />
+      {/* Fill Light: Lower-right — prevents crush on the fill side */}
+      <directionalLight position={[3.5, -2.0, 2.0]} intensity={1.6} color="#C8D8E8" />
 
-      {/* 3. Rim Light A: Soft green rear-right (#3CCB6E) */}
-      <directionalLight position={[4.0, 2.0, -3.0]} intensity={3.5} color="#3CCB6E" />
+      {/* Rim Light A: Emerald rear-right — matches CSS Layer 3 (right rim echo) */}
+      <directionalLight position={[4.0, 2.0, -3.0]} intensity={4.0} color="#00B85E" />
 
-      {/* 4. Rim Light B: Electric Orange rear-left (#FF5500) for Basketball */}
-      <directionalLight position={[-4.0, 2.0, -3.0]} intensity={3.5} color="#FF5500" />
+      {/* Rim Light B: Orange rear-left — basketball phase, matched in shadow plane */}
+      <directionalLight position={[-4.0, 2.0, -3.0]} intensity={4.0} color="#FF5500" />
 
-      {/* 5. Front Specular Highlight Light */}
-      <directionalLight position={[0.0, 0.0, 4.0]} intensity={1.8} color="#FFFFFF" />
-
-      {/* 6. Overhead Soft Spot */}
-      <directionalLight position={[0.0, 5.0, 0.0]} intensity={2.0} color="#E2E8F0" />
+      {/* Front specular — soft centre highlight for catch-light */}
+      <directionalLight position={[0.0, 0.5, 4.0]} intensity={1.2} color="#FFFFFF" />
 
       <DynamicRadialShadow
         hasKicked={hasKicked}

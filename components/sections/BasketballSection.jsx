@@ -10,6 +10,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import ContourLines from '../ui/ContourLines';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -56,24 +57,31 @@ export default function BasketballSection() {
       ref={sectionRef}
       className="relative w-full h-screen min-h-[660px] max-h-[900px] flex flex-col md:flex-row items-center justify-center bg-[#080909] px-6 sm:px-12 lg:px-20 overflow-hidden border-t border-[#FFFFFF]/10 py-8 md:py-0"
     >
-      {/* Background Ambient Electric Orange Glow Aura */}
-      <div className="absolute top-[20%] right-[-5%] md:top-1/2 md:right-[10%] -translate-y-1/2 w-[340px] sm:w-[520px] h-[340px] sm:h-[520px] rounded-full bg-[radial-gradient(circle,_#FF5500_0%,_#3A1200_45%,_transparent_75%)] opacity-25 blur-3xl pointer-events-none z-0" />
+      {/* Topographic contour lines — orange strokes on dark background.
+          Primary cluster behind the basketball (right ~75%), secondary lower-left. */}
+      <ContourLines
+        color="#FF5500"
+        baseOpacity={0.18}
+        className="absolute inset-0 w-full h-full pointer-events-none z-[1]"
+        cluster1={{ cx: 1100, cy: 440, rings: 11, r0: 55, rStep: 64, seedOffset: 80,  N: 10 }}
+        cluster2={{ cx: 200,  cy: 680, rings:  5, r0: 55, rStep: 70, seedOffset: 450, N:  9 }}
+      />
 
       <div className="w-full max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 lg:gap-10 items-center">
         {/* Left 7 Columns (58.3%): Basketball section content */}
         <div ref={contentRef} className="col-span-12 md:col-span-7 flex flex-col justify-center gap-4 sm:gap-6 z-10 pr-0 lg:pr-4 order-2 md:order-1">
-          {/* Category Tag (Architype Stedelijk + #FF5500 Electric Orange accent) */}
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-md bg-[#FF5500]/10 border border-[#FF5500]/25 w-fit">
+          {/* Category Tag (Space Mono) */}
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#FF5500]/10 border border-[#FF5500]/25 w-fit">
             <span className="w-2 h-2 rounded-full bg-[#FF5500] animate-pulse" />
-            <span className="font-stedelijk text-xs sm:text-sm font-bold tracking-widest uppercase text-[#FF5500]">
+            <span className="font-mono text-xs font-semibold tracking-widest uppercase text-[#FF5500]">
               02 / BASKETBALL ARENA
             </span>
           </div>
 
           {/* Display Headline (Humane + #F4F4F0 white text) */}
           <h2
-            className="font-humane font-bold uppercase text-[#F4F4F0] leading-[0.84] tracking-[-0.01em]"
-            style={{ fontSize: 'clamp(2.8rem, 6.8vw, 6.2rem)' }}
+            className="font-humane font-bold uppercase text-[#F4F4F0] leading-[0.82] tracking-[-0.01em]"
+            style={{ fontSize: 'clamp(3.2rem, 6.8vw, 6.0rem)' }}
           >
             FIBA-Spec Hardwood.<br />
             <span className="text-[#FF5500]">High-Flyer Approved.</span>

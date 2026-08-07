@@ -9,7 +9,7 @@ import { useGLTF } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const SCENE_BALL_RADIUS = 0.62;
+const SCENE_BALL_RADIUS = 0.993;
 
 export const Football = forwardRef(function Football(
   { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true },
@@ -127,42 +127,51 @@ export const Football = forwardRef(function Football(
     if (!isDragging.current) gl.domElement.style.cursor = '';
   }, [gl]);
 
-  const { standaloneMesh, baseScale, materialsRef } = useMemo(() => {
-    let rawMesh = null;
-    scene.traverse((child) => {
-      if (child.isMesh && !rawMesh) {
-        rawMesh = child;
-      }
-    });
+  const { standaloneObject, baseScale, materialsRef } = useMemo(() => {
+    const clonedScene = scene.clone(true);
 
-    if (!rawMesh) {
-      return { standaloneMesh: new THREE.Mesh(), baseScale: 1, materialsRef: [] };
-    }
-
-    const geom = rawMesh.geometry.clone();
-    geom.computeBoundingBox();
-    const box = geom.boundingBox;
+    const box = new THREE.Box3().setFromObject(clonedScene);
     const center = new THREE.Vector3();
     box.getCenter(center);
 
-    geom.translate(-center.x, -center.y, -center.z);
-    geom.computeBoundingBox();
-    geom.computeVertexNormals();
+    clonedScene.position.set(-center.x, -center.y, -center.z);
+
+    const wrapper = new THREE.Group();
+    wrapper.add(clonedScene);
 
     const size = new THREE.Vector3();
-    geom.boundingBox.getSize(size);
+    box.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z);
-    const normScale = (SCENE_BALL_RADIUS * 2) / maxDim;
+    const normScale = (SCENE_BALL_RADIUS * 2) / (maxDim || 1);
 
-    const mat = rawMesh.material ? rawMesh.material.clone() : new THREE.MeshStandardMaterial();
-    mat.envMapIntensity = 2.4;
-    mat.roughness       = 0.26;
-    mat.metalness       = 0.16;
-    mat.transparent     = opacity < 0.99;
-    mat.opacity         = opacity;
+    const mats = [];
+    clonedScene.traverse((child) => {
+      if (child.isMesh) {
+        if (Array.isArray(child.material)) {
+          child.material = child.material.map((m) => {
+            const mat = m.clone();
+            mat.envMapIntensity = 2.4;
+            mat.roughness       = 0.26;
+            mat.metalness       = 0.16;
+            mat.transparent     = opacity < 0.99;
+            mat.opacity         = opacity;
+            mats.push(mat);
+            return mat;
+          });
+        } else if (child.material) {
+          const mat = child.material.clone();
+          mat.envMapIntensity = 2.4;
+          mat.roughness       = 0.26;
+          mat.metalness       = 0.16;
+          mat.transparent     = opacity < 0.99;
+          mat.opacity         = opacity;
+          child.material      = mat;
+          mats.push(mat);
+        }
+      }
+    });
 
-    const mesh = new THREE.Mesh(geom, mat);
-    return { standaloneMesh: mesh, baseScale: normScale, materialsRef: [mat] };
+    return { standaloneObject: wrapper, baseScale: normScale, materialsRef: mats };
   }, [scene, opacity]);
 
   useImperativeHandle(ref, () => ({
@@ -200,7 +209,7 @@ export const Football = forwardRef(function Football(
     >
       <group ref={innerRef} position={[0, 0, 0]} rotation={[0, Math.PI, 0]}>
         <group ref={meshRef}>
-          <primitive object={standaloneMesh} scale={baseScale * scale} />
+          <primitive object={standaloneObject} scale={baseScale * scale} />
         </group>
       </group>
     </group>
