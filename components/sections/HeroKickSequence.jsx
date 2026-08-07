@@ -20,7 +20,7 @@ const ZONES = [
 function EntryBackground() {
   return (
     <svg
-      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-40"
       viewBox="0 0 1000 600"
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
@@ -28,13 +28,13 @@ function EntryBackground() {
       <defs>
         <style>{`
           @keyframes ring-pulse-1 {
-            0%   { r: 70;  opacity: 0.22; stroke-width: 1.5px; }
-            50%  { r: 240; opacity: 0.10; stroke-width: 1.0px; }
+            0%   { r: 70;  opacity: 0.15; stroke-width: 1.5px; }
+            50%  { r: 240; opacity: 0.06; stroke-width: 1.0px; }
             100% { r: 340; opacity: 0;    stroke-width: 0.5px; }
           }
           @keyframes ring-pulse-2 {
-            0%   { r: 50;  opacity: 0.18; }
-            50%  { r: 200; opacity: 0.08; }
+            0%   { r: 50;  opacity: 0.12; }
+            50%  { r: 200; opacity: 0.05; }
             100% { r: 300; opacity: 0;    }
           }
           @keyframes arena-spin {
@@ -47,12 +47,12 @@ function EntryBackground() {
           }
           @keyframes line-stroke {
             0%   { stroke-dashoffset: 800; opacity: 0; }
-            20%  { opacity: 0.12; }
-            100% { stroke-dashoffset: 0; opacity: 0.12; }
+            20%  { opacity: 0.08; }
+            100% { stroke-dashoffset: 0; opacity: 0.08; }
           }
           @keyframes float-marker {
-            0%, 100% { transform: translateY(0px);   opacity: 0.30; }
-            50%       { transform: translateY(-16px); opacity: 0.55; }
+            0%, 100% { transform: translateY(0px);   opacity: 0.20; }
+            50%       { transform: translateY(-16px); opacity: 0.35; }
           }
           .pulse-ring-1 {
             transform-origin: 500px 300px;
@@ -88,25 +88,25 @@ function EntryBackground() {
         `}</style>
       </defs>
 
-      <circle className="pulse-ring-1" cx="500" cy="300" r="70" fill="none" stroke="#39D477" />
-      <circle className="pulse-ring-2" cx="500" cy="300" r="50" fill="none" stroke="#39D477" />
+      <circle className="pulse-ring-1" cx="500" cy="300" r="70" fill="none" stroke="#3CCB6E" />
+      <circle className="pulse-ring-2" cx="500" cy="300" r="50" fill="none" stroke="#3CCB6E" />
 
       <g className="spin-ring-outer">
-        <circle cx="500" cy="300" r="220" fill="none" stroke="#1A1D1C" strokeWidth="0.8" strokeDasharray="24 16" opacity="0.40" />
-        <circle cx="500" cy="300" r="224" fill="none" stroke="#39D477" strokeWidth="0.5" strokeDasharray="4 40" opacity="0.20" />
+        <circle cx="500" cy="300" r="220" fill="none" stroke="#1A1D1C" strokeWidth="0.8" strokeDasharray="24 16" opacity="0.30" />
+        <circle cx="500" cy="300" r="224" fill="none" stroke="#3CCB6E" strokeWidth="0.5" strokeDasharray="4 40" opacity="0.15" />
       </g>
 
       <g className="spin-ring-inner">
-        <circle cx="500" cy="300" r="140" fill="none" stroke="#39D477" strokeWidth="0.9" strokeDasharray="12 24" opacity="0.15" />
+        <circle cx="500" cy="300" r="140" fill="none" stroke="#3CCB6E" strokeWidth="0.9" strokeDasharray="12 24" opacity="0.10" />
       </g>
 
       <line className="court-line-a" x1="600" y1="0" x2="1000" y2="400" stroke="#1A1D1C" strokeWidth="0.8" />
-      <line className="court-line-b" x1="720" y1="0" x2="1000" y2="280" stroke="#39D477" strokeWidth="0.6" />
+      <line className="court-line-b" x1="720" y1="0" x2="1000" y2="280" stroke="#3CCB6E" strokeWidth="0.6" />
       <line className="court-line-a" x1="0" y1="380" x2="400" y2="600" stroke="#1A1D1C" strokeWidth="0.6" />
 
-      <circle className="marker-1" cx="840" cy="90"  r="3.5" fill="#39D477" opacity="0.45" />
-      <circle className="marker-2" cx="160" cy="120" r="3"   fill="#39D477" opacity="0.40" />
-      <circle className="marker-3" cx="890" cy="500" r="2.5" fill="#39D477" opacity="0.25" />
+      <circle className="marker-1" cx="840" cy="90"  r="3.5" fill="#3CCB6E" opacity="0.30" />
+      <circle className="marker-2" cx="160" cy="120" r="3"   fill="#3CCB6E" opacity="0.25" />
+      <circle className="marker-3" cx="890" cy="500" r="2.5" fill="#3CCB6E" opacity="0.15" />
     </svg>
   );
 }
@@ -143,12 +143,20 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
     });
   }, [hasKicked]);
 
-  if (!mounted) return <section className="w-full h-screen bg-[#0A0B0D]" />;
+  if (!mounted) return <section className="w-full h-screen bg-[#080909]" />;
 
   return (
-    <section className="relative w-full min-h-screen md:h-screen bg-[#0A0B0D] overflow-hidden">
+    <section className="relative w-full min-h-screen md:h-screen bg-[#080909] overflow-hidden">
 
       {!hasKicked && <EntryBackground />}
+
+      {/* Extremely subtle environment radial illumination behind ball (#101513 fading to #080909) */}
+      <div className={`absolute top-1/2 ${hasKicked ? 'right-[10%] md:right-[15%]' : 'left-1/2 -translate-x-1/2'} -translate-y-1/2
+        w-[500px] sm:w-[650px] h-[500px] sm:h-[650px] rounded-full
+        bg-[radial-gradient(circle,_#101513_0%,_rgba(16,21,19,0.40)_40%,_transparent_75%)]
+        blur-3xl pointer-events-none z-0
+        transition-all duration-1000 ease-out`}
+      />
 
       {/* 3D WebGL Canvas Layer */}
       <div className="absolute inset-0 z-10 pointer-events-auto">
@@ -166,7 +174,7 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
 
       {impactFlash && (
         <div className="absolute inset-0 z-20 pointer-events-none
-          bg-[radial-gradient(circle_at_60%_40%,_rgba(57,212,119,0.22)_0%,_transparent_55%)]" />
+          bg-[radial-gradient(circle_at_60%_40%,_rgba(60,203,110,0.12)_0%,_transparent_55%)]" />
       )}
 
       {/* PHASE 2 LAYOUT */}
@@ -187,7 +195,7 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
             style={{ fontSize: 'clamp(3.2rem, 14vw, 9.5rem)' }}
           >
             <span className="block">Dharan's</span>
-            <span className="block text-[#39D477]">Premier</span>
+            <span className="block text-[#3CCB6E]">Premier</span>
             <span className="block">Sports Hub.</span>
           </h1>
         </div>
@@ -208,7 +216,7 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
                 <div key={z.name} className="flex items-center gap-2.5">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded border border-[#123D27]
                     flex items-center justify-center shrink-0 bg-[#123D27]/40">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#39D477]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#3CCB6E]" />
                   </div>
                   <div>
                     <span className="text-[12px] sm:text-[13px] font-sans text-[#F4F4F0] font-medium block md:inline">
@@ -241,7 +249,7 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
         <a
           href="#facilities-overview"
           className="inline-flex items-center gap-2 mt-4 md:mt-5 text-[13px] font-sans
-            text-[#85878A] hover:text-[#39D477] transition-colors duration-200
+            text-[#85878A] hover:text-[#3CCB6E] transition-colors duration-200
             pointer-events-auto"
         >
           Discover more
@@ -258,20 +266,20 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
           id="kick-cta"
           onClick={handleKick}
           className="group flex items-center gap-2.5
-            bg-[#123D27] hover:bg-[#185234] border border-[#39D477]/40 text-[#F4F4F0]
+            bg-[#123D27] hover:bg-[#185234] border border-[#3CCB6E]/40 text-[#F4F4F0]
             pl-5 pr-3 py-3 rounded-full shadow-xl shadow-black/40
             transition-all duration-200 hover:scale-105 active:scale-95"
         >
           <span className="text-[13px] font-sans font-medium tracking-tight">
             Kick the ball to open
           </span>
-          <span className="w-7 h-7 rounded-full bg-[#39D477]
+          <span className="w-7 h-7 rounded-full bg-[#3CCB6E]
             flex items-center justify-center
             transition-transform duration-300 group-hover:rotate-45">
-            <ArrowUpRight size={14} className="text-[#0A0B0D]" strokeWidth={2.5} />
+            <ArrowUpRight size={14} className="text-[#080909]" strokeWidth={2.5} />
           </span>
         </button>
-        <div className="w-px h-5 bg-[#39D477]/30 animate-pulse" />
+        <div className="w-px h-5 bg-[#3CCB6E]/30 animate-pulse" />
       </div>
 
     </section>

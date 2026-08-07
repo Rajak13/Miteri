@@ -1,20 +1,13 @@
 'use client';
 
 /**
- * Football — 3D Football Mesh with Direct Geometry Extraction & Centroid Baking.
+ * Football — Premium Sports Photography Studio 3D Mesh.
  *
- * Problem Solved:
- * Raw GLTF model files (e.g. Sketchfab/FBX exports) contain nested scene graph nodes
- * with non-zero translation matrices (e.g. Sketchfab_model translated by [-28, 292, -147]).
- * When rotating parent groups, nested child meshes orbit around the parent origin.
- *
- * Solution:
- * We extract the raw BufferGeometry directly, discard all GLTF parent nodes,
- * and translate geometry vertices so the bounding box centroid is EXPLICITLY at (0,0,0).
- *
- * Result:
- * The resulting standalone THREE.Mesh has ZERO parent offsets. Rotating innerRef
- * turns the ball dead-center on its origin with 100% guaranteed zero translation/movement.
+ * Material tuning:
+ * - roughness = 0.32 (controlled leather texture response)
+ * - metalness = 0.12 (subtle panel seam highlights)
+ * - envMapIntensity = 1.8 (balanced environmental reflection)
+ * - Keeps ball predominantly dark black as real leather.
  */
 
 import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback } from 'react';
@@ -42,7 +35,6 @@ export const Football = forwardRef(function Football(
   const SPIN_SCALE = 0.009;
   const DAMPING    = 0.88;
 
-  // Frame momentum coasting on innerRef rotation ONLY
   useFrame(() => {
     if (!innerRef.current || !isCoasting.current || isDragging.current) return;
 
@@ -82,8 +74,8 @@ export const Football = forwardRef(function Football(
       const dx = ev.clientX - prevMouse.current.x;
       const dy = ev.clientY - prevMouse.current.y;
 
-      const aY = dx * SPIN_SCALE;  // Horizontal drag → Y-axis spin
-      const aX = dy * SPIN_SCALE;  // Vertical drag   → X-axis pitch
+      const aY = dx * SPIN_SCALE;
+      const aX = dy * SPIN_SCALE;
 
       innerRef.current.rotation.y += aY;
       innerRef.current.rotation.x = THREE.MathUtils.clamp(
@@ -120,7 +112,6 @@ export const Football = forwardRef(function Football(
     if (!isDragging.current) gl.domElement.style.cursor = '';
   }, [gl]);
 
-  // Extract raw mesh geometry, discard GLTF parent nodes, and translate vertices to (0,0,0)
   const { standaloneMesh, baseScale } = useMemo(() => {
     let rawMesh = null;
     scene.traverse((child) => {
@@ -139,7 +130,6 @@ export const Football = forwardRef(function Football(
     const center = new THREE.Vector3();
     box.getCenter(center);
 
-    // Shift all vertex positions so geometric center is EXPLICITLY at (0,0,0)
     geom.translate(-center.x, -center.y, -center.z);
     geom.computeBoundingBox();
     geom.computeVertexNormals();
@@ -150,9 +140,9 @@ export const Football = forwardRef(function Football(
     const normScale = (SCENE_BALL_RADIUS * 2) / maxDim;
 
     const mat = rawMesh.material ? rawMesh.material.clone() : new THREE.MeshStandardMaterial();
-    mat.envMapIntensity = 2.4;
-    mat.roughness       = 0.24;
-    mat.metalness       = 0.10;
+    mat.envMapIntensity = 1.8;
+    mat.roughness       = 0.32; // Controlled leather texture response
+    mat.metalness       = 0.12; // Controlled panel seam highlights
 
     const mesh = new THREE.Mesh(geom, mat);
     return { standaloneMesh: mesh, baseScale: normScale };

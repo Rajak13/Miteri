@@ -1,10 +1,14 @@
 'use client';
 
 /**
- * HeroCanvas — 3D Canvas tuned for Obsidian Dark Carbon Theme (#0A0B0D).
+ * HeroCanvas — Premium Sports Photography Studio 3D Scene.
  *
- * Direct multi-point studio lights with key, fill, and green rim highlights
- * give the dark leather football an extraordinary, tactile 3D pop against obsidian background.
+ * Studio Lighting Setup:
+ * - Key Light: Large soft neutral light from upper-left/front (intensity 2.4, #F8FAFC).
+ *              Reveals leather texture and polygon seams while keeping the ball predominantly dark.
+ * - Rim Light: Soft green light from rear-right (intensity 1.2, #3CCB6E).
+ *              Creates a thin green separation line along silhouette edges.
+ * - Ground Shadow: Soft wide radial contact shadow (low opacity 0.40, wide radius 2.4).
  */
 
 import React, { useMemo, useEffect, useRef } from 'react';
@@ -16,7 +20,7 @@ import EntryDropController from './EntryDropController';
 import KickMotionController from './KickMotionController';
 
 const SPLINE = new THREE.CatmullRomCurve3([
-  new THREE.Vector3( 0.00, -0.15,  0.00),  // P0 start (exact Phase 1 rest spot)
+  new THREE.Vector3( 0.00, -0.15,  0.00),  // P0 start
   new THREE.Vector3( 0.35,  0.20,  0.10),  // P1 kick impulse
   new THREE.Vector3( 1.60,  0.45, -0.20),  // P2 off-screen right
   new THREE.Vector3( 1.70,  0.00, -0.30),  // P3 apex curve
@@ -57,8 +61,8 @@ function DynamicRadialShadow({ hasKicked, progressRef }) {
     c.height  = 64;
     const ctx = c.getContext('2d');
     const g   = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    g.addColorStop(0.0, 'rgba(0, 0, 0, 0.75)');
-    g.addColorStop(0.4, 'rgba(0, 0, 0, 0.35)');
+    g.addColorStop(0.0, 'rgba(0, 0, 0, 0.45)');
+    g.addColorStop(0.5, 'rgba(0, 0, 0, 0.15)');
     g.addColorStop(1.0, 'rgba(0, 0, 0, 0.00)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 64, 64);
@@ -78,12 +82,12 @@ function DynamicRadialShadow({ hasKicked, progressRef }) {
   });
 
   if (!shadowTexture) return null;
-  const shadowSize = isMobile ? 2.2 : 1.8;
+  const shadowSize = isMobile ? 2.6 : 2.4;
 
   return (
     <mesh ref={meshRef} position={[0, -0.45, 0]} rotation-x={-Math.PI / 2}>
       <planeGeometry args={[shadowSize, shadowSize]} />
-      <meshBasicMaterial map={shadowTexture} transparent depthWrite={false} opacity={0.70} />
+      <meshBasicMaterial map={shadowTexture} transparent depthWrite={false} opacity={0.40} />
     </mesh>
   );
 }
@@ -136,12 +140,17 @@ export default function HeroCanvas({
       <WebGLContextHandler />
       <SceneCamera />
 
-      {/* Dramatic Studio Lighting for Obsidian Dark Carbon Theme */}
-      <ambientLight     intensity={1.2} color="#F4F4F0" />
-      <hemisphereLight  args={['#FFFFFF', '#141619', 1.0]} />
-      <directionalLight position={[ 3,  6,  5]} intensity={4.2} color="#FFFFFF" />
-      <directionalLight position={[-4,  2,  3]} intensity={2.0} color="#39D477" />  {/* Kinetic Green Rim Light */}
-      <directionalLight position={[ 0,  4, -4]} intensity={1.8} color="#E8F5EE" />
+      {/* Premium Sports Photography Studio 3D Lighting */}
+      <ambientLight intensity={0.6} color="#FFFFFF" />
+      
+      {/* Key Light: Large soft neutral light from upper-left/front */}
+      <directionalLight position={[-3.5, 5.0, 4.0]} intensity={2.4} color="#F8FAFC" />
+      
+      {/* Rim Light: Very soft green light from rear-right (#3CCB6E, low intensity 1.2) */}
+      <directionalLight position={[4.0, 2.0, -3.0]} intensity={1.2} color="#3CCB6E" />
+      
+      {/* Subtle Fill Light from bottom-front */}
+      <directionalLight position={[0.0, -2.0, 3.0]} intensity={0.5} color="#E8ECE9" />
 
       <DynamicRadialShadow hasKicked={hasKicked} progressRef={progressRef} />
 

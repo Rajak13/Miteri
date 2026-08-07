@@ -71,15 +71,14 @@
 
 /* ─── DESIGN TOKENS ────────────────────────────────────────────── */
 :root {
-  --bg:          #0A0B0D;   /* obsidian dark carbon              */
-  --bg-off:      #141619;   /* slightly elevated surface          */
+  --bg:          #080909;   /* studio deep black/grey            */
+  --bg-off:      #101513;   /* subtle dark ambient tone          */
   --ink:         #F4F4F0;   /* primary off-white text            */
   --ink-muted:   #85878A;   /* secondary slate grey text         */
   --ink-faint:   #505459;   /* faint captions, borders           */
-  --accent:      #39D477;   /* vivid kinetic green               */
+  --accent:      #3CCB6E;   /* Miteri green                      */
   --deep-green:  #123D27;   /* deep emerald container            */
   --surface:     #1A1D1C;   /* dark card surface                 */
-  --white-obj:   #EDEDEA;   /* warm white objects                */
   --border:      rgba(255, 255, 255, 0.08);
 }
 
@@ -102,7 +101,7 @@
 
 html {
   scroll-behavior: smooth;
-  background-color: #0A0B0D;
+  background-color: #080909;
 }
 
 body {
