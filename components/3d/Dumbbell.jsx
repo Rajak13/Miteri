@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Shuttlecock — Full GLTF scene render + merged hit mesh for reliable drag rotation.
- * shuttlecock.glb has 24 meshes — visual uses cloned scene, interaction uses merged geometry.
+ * Dumbbell — Full GLTF scene render + merged hit mesh for reliable drag rotation.
+ * dumbbells.glb — visual uses cloned scene, interaction uses merged geometry.
  */
 
 import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback, useEffect } from 'react';
@@ -13,7 +13,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const SCENE_HIT_RADIUS = 0.72;
 
-export const Shuttlecock = forwardRef(function Shuttlecock(
+export const Dumbbell = forwardRef(function Dumbbell(
   { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true },
   ref
 ) {
@@ -22,7 +22,7 @@ export const Shuttlecock = forwardRef(function Shuttlecock(
   const meshRef  = useRef();
   const hitMeshRef = useRef(null);
 
-  const { scene }          = useGLTF('/models/shuttlecock.glb');
+  const { scene }          = useGLTF('/models/dumbbells.glb');
   const { invalidate, gl } = useThree();
 
   const isDragging        = useRef(false);
@@ -144,8 +144,8 @@ export const Shuttlecock = forwardRef(function Shuttlecock(
         const applyMat = (m) => {
           const mat = m.clone();
           mat.envMapIntensity = 2.0;
-          mat.roughness       = 0.32;
-          mat.metalness       = 0.10;
+          mat.roughness       = 0.25;
+          mat.metalness       = 0.75;
           mat.transparent     = opacity < 0.99;
           mat.opacity         = opacity;
           mat.depthWrite      = true;
@@ -161,7 +161,7 @@ export const Shuttlecock = forwardRef(function Shuttlecock(
       }
     });
 
-    // Merged geometry for accurate raycasting (matches Basketball/Football pattern)
+    // Merged geometry for accurate raycasting
     const sourceMeshes = [];
     scene.traverse((child) => {
       if (child.isMesh) sourceMeshes.push(child);
@@ -255,5 +255,5 @@ export const Shuttlecock = forwardRef(function Shuttlecock(
   );
 });
 
-useGLTF.preload('/models/shuttlecock.glb');
-export default Shuttlecock;
+useGLTF.preload('/models/dumbbells.glb');
+export default Dumbbell;

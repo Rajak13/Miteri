@@ -246,6 +246,42 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
 
   useEffect(() => { setMounted(true); }, []);
 
+  // Hide 3D canvas when scrolling past gym section into footer
+  useEffect(() => {
+    const handleScroll = () => {
+      const gymEl = document.getElementById('gym-section');
+      if (!gymEl) return;
+      
+      const rect = gymEl.getBoundingClientRect();
+      const vh = window.innerHeight;
+      
+      // Start fading earlier – when the bottom of the gym section is at
+      // ~55% of the viewport and continue until it's at 15%
+      const fadeStart = vh * 0.55;   // begin fade
+      const fadeEnd   = vh * 0.15;   // fully gone
+
+      let opacity = 1;
+      if (rect.bottom <= fadeEnd) {
+        opacity = 0;
+      } else if (rect.bottom < fadeStart) {
+        // Linear fade between fadeStart → fadeEnd
+        opacity = (rect.bottom - fadeEnd) / (fadeStart - fadeEnd);
+      }
+
+      // Direct DOM write – zero React re-renders while scrolling
+      const canvasWrapper = document.querySelector('.hero-canvas-wrapper');
+      if (canvasWrapper) {
+        canvasWrapper.style.opacity = String(Math.max(0, Math.min(1, opacity)));
+        canvasWrapper.style.pointerEvents = opacity < 0.05 ? 'none' : 'auto';
+        canvasWrapper.style.zIndex = opacity < 0.05 ? '0' : '10';
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Direct DOM opacity mutation on scroll (zero React state re-renders during scroll)
   useEffect(() => {
     if (!showLayout) return;
@@ -405,8 +441,9 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
         </div>
       )}
 
-      {/* 3D WebGL Canvas Layer — pointer-events-auto so WebGL canvas receives mouse events for hover grab cursor & drag rotation */}
-      <div className="fixed inset-0 z-10 pointer-events-auto">
+      {/* 3D WebGL Canvas Layer — pointer-events-auto so WebGL canvas receives mouse events for hover grab cursor & drag rotation 
+          BUT when fading out, remove pointer events so footer links become clickable */}
+      <div className="hero-canvas-wrapper fixed inset-0 transition-opacity duration-300" style={{ opacity: 1, zIndex: 10 }}>
         <HeroCanvas
           hasKicked={hasKicked}
           isInteractive={isInteractive}

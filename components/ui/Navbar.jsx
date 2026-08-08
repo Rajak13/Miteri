@@ -25,9 +25,12 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
 
   const isOrange = theme === 'orange';
   const isBlue   = theme === 'blue';
+  const isRed    = theme === 'red';
 
-  const accentColor = isBlue ? '#0091D5' : isOrange ? '#FF5500' : '#00C864';
-  const ctaHoverBg  = isBlue
+  const accentColor = isRed ? '#B91C1C' : isBlue ? '#0091D5' : isOrange ? '#FF5500' : '#00C864';
+  const ctaHoverBg  = isRed
+    ? 'hover:bg-[#3A0808] hover:border-[#B91C1C]/50 hover:text-[#B91C1C]'
+    : isBlue
     ? 'hover:bg-[#002840] hover:border-[#0091D5]/50 hover:text-[#0091D5]'
     : isOrange
     ? 'hover:bg-[#3A1200] hover:border-[#FF5500]/50 hover:text-[#FF5500]'
