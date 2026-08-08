@@ -103,10 +103,6 @@ export default function Home() {
         <FutsalSection />
         <BasketballSection />
         <BadmintonSection />
-      </div>
-
-      {/* Footer — positioned above canvas to prevent shuttlecock bleed */}
-      <div className="relative z-20 bg-[#0D0D0E]">
         <Footer />
       </div>
     </main>
