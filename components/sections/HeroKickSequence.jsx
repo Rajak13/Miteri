@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { ArrowUpRight, ArrowDown, Dumbbell } from 'lucide-react';
 import gsap from 'gsap';
+import LoadingScreen from '../ui/LoadingScreen';
 
 const HeroCanvas = dynamic(
   () => import('../3d/HeroCanvas'),
@@ -243,6 +244,7 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
   const [shockwaveActive, setShockwaveActive] = useState(false);
   const [showLayout,       setShowLayout]       = useState(false);
   const [darkTheme,        setDarkTheme]        = useState(false);
+  const [modelsLoaded,     setModelsLoaded]     = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -334,6 +336,16 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
   }, [hasKicked, darkTheme, showLayout, onGoalUnlocked, onNavbarReveal]);
 
   if (!mounted) return <section id="hero-section" className="w-full h-screen bg-[#F2EFE9]" />;
+
+  // Show loading screen until models are loaded
+  if (!modelsLoaded) {
+    return (
+      <>
+        <LoadingScreen />
+        <section id="hero-section" className="w-full h-screen bg-[#F2EFE9]" />
+      </>
+    );
+  }
 
   return (
     <section id="hero-section" className={`relative w-full h-[100svh] overflow-hidden transition-colors duration-1000 ${
@@ -444,15 +456,18 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
       {/* 3D WebGL Canvas Layer — pointer-events-auto so WebGL canvas receives mouse events for hover grab cursor & drag rotation 
           BUT when fading out, remove pointer events so footer links become clickable */}
       <div className="hero-canvas-wrapper fixed inset-0 transition-opacity duration-300" style={{ opacity: 1, zIndex: 10 }}>
-        <HeroCanvas
-          hasKicked={hasKicked}
-          isInteractive={isInteractive}
-          progressRef={progressRef}
-          footballRef={footballRef}
-          onSettle={handleSettle}
-          onGoalUnlocked={() => {}}
-          sequenceComplete={showLayout}
-        />
+        <Suspense fallback={null}>
+          <HeroCanvas
+            hasKicked={hasKicked}
+            isInteractive={isInteractive}
+            progressRef={progressRef}
+            footballRef={footballRef}
+            onSettle={handleSettle}
+            onGoalUnlocked={() => {}}
+            sequenceComplete={showLayout}
+            onModelsLoaded={() => setModelsLoaded(true)}
+          />
+        </Suspense>
       </div>
 
       {/* PHASE 2 — RESPONSIVE LAYOUT */}
