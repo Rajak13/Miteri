@@ -797,6 +797,7 @@ export default function HeroCanvas({
   footballRef,
   onSettle,
   sequenceComplete,
+  onModelsLoaded,
 }) {
   const spinEnabled = (isInteractive && !hasKicked) || !!sequenceComplete;
   const futsalProgressRef = useRef(0);
@@ -806,6 +807,17 @@ export default function HeroCanvas({
   const basketballRef = useRef(null);
   const shuttlecockRef = useRef(null);
   const dumbbellRef = useRef(null);
+
+  // Signal when models are loaded
+  useEffect(() => {
+    if (onModelsLoaded) {
+      // Small delay to ensure all models are ready
+      const timer = setTimeout(() => {
+        onModelsLoaded();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [onModelsLoaded]);
 
   return (
     <Canvas
