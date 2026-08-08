@@ -123,3 +123,10 @@ body {
 .nav-border {
   border-bottom: 1px solid var(--border);
 }
+
+/* ─── AWWWARDS TEXT REVEAL UTILITIES ────────────────────────────── */
+.text-reveal-mask {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  display: block;
+  overflow: hidden;
+}

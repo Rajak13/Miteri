@@ -45,6 +45,7 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
         {/* ── LEFT: Logo ─────────────────────────────────── */}
         <a
           href="/"
+          data-magnetic
           className="flex items-center gap-2 shrink-0 group focus:outline-none"
           aria-label="Miteri Sports Center"
         >
@@ -75,7 +76,8 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
               key={link.label}
               href={link.href}
               role="menuitem"
-              className="text-[11px] text-[#85878A] hover:text-[#F4F4F0] transition-colors duration-150 font-mono tracking-widest uppercase"
+              data-magnetic
+              className="text-[11px] text-[#85878A] hover:text-[#F4F4F0] transition-colors duration-150 font-mono tracking-widest uppercase px-2 py-1"
             >
               {link.label}
             </a>
@@ -86,6 +88,7 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
         <div className="flex items-center gap-4">
           <button
             onClick={onBookNow}
+            data-magnetic
             className={`hidden md:flex items-center gap-1.5 text-[11px] font-stedelijk tracking-wide text-[#F4F4F0] bg-[#1A1D1C] border border-[#1A1D1C] ${ctaHoverBg} px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer`}
           >
             Book a Court

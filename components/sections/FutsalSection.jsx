@@ -39,13 +39,13 @@ export default function FutsalSection() {
       if (contentRef.current) {
         gsap.fromTo(
           contentRef.current.children,
-          { opacity: 0, y: 24 },
+          { opacity: 0, y: 36 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            stagger: 0.1,
-            ease: 'power3.out',
+            duration: 0.9,
+            stagger: 0.12,
+            ease: 'power4.out',
             scrollTrigger: {
               trigger: el,
               start: 'top 70%',
@@ -124,6 +124,7 @@ export default function FutsalSection() {
           <div className="pt-1">
             <button
               onClick={() => alert('Opening Miteri Futsal Court Booking…')}
+              data-magnetic
               className="group inline-flex items-center gap-3 bg-[#0D0D0E] hover:bg-[#1A1D1C] text-[#F4F1EA] px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-stedelijk text-xs sm:text-sm font-semibold tracking-tight transition-all duration-300 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
             >
               <span>Book Futsal Court</span>

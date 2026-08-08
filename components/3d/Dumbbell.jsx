@@ -29,7 +29,7 @@ export const Dumbbell = forwardRef(function Dumbbell(
   const prevMouse         = useRef({ x: 0, y: 0 });
   const angVel            = useRef({ x: 0, y: 0 });
   const isCoasting        = useRef(false);
-  const pointerEnabledRef = useRef(false);
+  const pointerEnabledRef = useRef(true);
 
   const dragRotationRef = useRef({ x: 0, y: 0 });
   const baseRotationRef = useRef({ x: 0, y: Math.PI, z: 0 });

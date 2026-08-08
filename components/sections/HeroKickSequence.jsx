@@ -337,20 +337,13 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
 
   if (!mounted) return <section id="hero-section" className="w-full h-screen bg-[#F2EFE9]" />;
 
-  // Show loading screen until models are loaded
-  if (!modelsLoaded) {
-    return (
-      <>
-        <LoadingScreen />
-        <section id="hero-section" className="w-full h-screen bg-[#F2EFE9]" />
-      </>
-    );
-  }
+
 
   return (
     <section id="hero-section" className={`relative w-full h-[100svh] overflow-hidden transition-colors duration-1000 ${
       darkTheme ? 'bg-[#080b08]' : 'bg-[#F2EFE9]'
     }`}>
+      {!modelsLoaded && <LoadingScreen />}
 
       {!hasKicked && <EntryBackground />}
 
@@ -622,6 +615,7 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
         <button
           id="kick-cta"
           onClick={handleKick}
+          data-magnetic
           className="group flex items-center gap-2.5
             bg-[#0D0D0E] hover:bg-[#222] text-white
             pl-5 pr-3 py-3 rounded-full shadow-xl

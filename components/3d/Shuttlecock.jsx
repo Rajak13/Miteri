@@ -29,13 +29,13 @@ export const Shuttlecock = forwardRef(function Shuttlecock(
   const prevMouse         = useRef({ x: 0, y: 0 });
   const angVel            = useRef({ x: 0, y: 0 });
   const isCoasting        = useRef(false);
-  const pointerEnabledRef = useRef(false);
+  const pointerEnabledRef = useRef(true);
 
   const dragRotationRef = useRef({ x: 0, y: 0 });
   const baseRotationRef = useRef({ x: 0, y: Math.PI, z: 0 });
 
-  const SPIN_SCALE = 0.009;
-  const DAMPING    = 0.88;
+  const SPIN_SCALE = 0.012;
+  const DAMPING    = 0.94;
 
   const updateCombinedRotation = useCallback(() => {
     if (!innerRef.current) return;
@@ -55,7 +55,11 @@ export const Shuttlecock = forwardRef(function Shuttlecock(
     }
 
     dragRotationRef.current.y += angVel.current.y;
-    dragRotationRef.current.x += angVel.current.x;
+    dragRotationRef.current.x = THREE.MathUtils.clamp(
+      dragRotationRef.current.x + angVel.current.x,
+      -Math.PI * 0.45,
+      Math.PI * 0.45
+    );
 
     angVel.current.x *= DAMPING;
     angVel.current.y *= DAMPING;
@@ -85,7 +89,11 @@ export const Shuttlecock = forwardRef(function Shuttlecock(
       const aX = dy * SPIN_SCALE;
 
       dragRotationRef.current.y += aY;
-      dragRotationRef.current.x += aX;
+      dragRotationRef.current.x = THREE.MathUtils.clamp(
+        dragRotationRef.current.x + aX,
+        -Math.PI * 0.45,
+        Math.PI * 0.45
+      );
 
       angVel.current    = { x: aX, y: aY };
       prevMouse.current = { x: ev.clientX, y: ev.clientY };

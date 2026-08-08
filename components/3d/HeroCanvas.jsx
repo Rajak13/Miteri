@@ -19,6 +19,7 @@ import Football from './Football';
 import Basketball from './Basketball';
 import Shuttlecock from './Shuttlecock';
 import Dumbbell from './Dumbbell';
+import DustParticles from './DustParticles';
 import EntryDropController from './EntryDropController';
 
 if (typeof window !== 'undefined') {
@@ -927,6 +928,9 @@ export default function HeroCanvas({
         opacity={0.0}
         spinEnabled={spinEnabled}
       />
+
+      {/* Ambient 3D Dust Particles */}
+      <DustParticles count={140} />
 
       {/* 3D Dumbbell Mesh (Morph Target) */}
       <Dumbbell
