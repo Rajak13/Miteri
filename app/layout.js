@@ -68,7 +68,7 @@ export const metadata = {
     canonical: 'https://miteri.verel.app',
   },
   verification: {
-    google: 'oZtcVT9QsP-ourIjSFOnkS2aQnTJjteABo8W3EVttgo',
+    google: 'ti1_pW68KeXu5FW-Fkxdsod33q1-ykGRy8fyIwpos2M',
   },
 };
 
