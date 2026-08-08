@@ -73,7 +73,7 @@ export default function BasketballSection() {
           {/* Category Tag (Space Mono) */}
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#FF5500]/10 border border-[#FF5500]/25 w-fit">
             <span className="w-2 h-2 rounded-full bg-[#FF5500] animate-pulse" />
-            <span className="font-mono text-xs font-semibold tracking-widest uppercase text-[#FF5500]">
+            <span className="font-stedelijk text-xs tracking-widest uppercase text-[#FF5500]">
               02 / BASKETBALL ARENA
             </span>
           </div>

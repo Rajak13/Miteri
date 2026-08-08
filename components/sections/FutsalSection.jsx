@@ -84,7 +84,7 @@ export default function FutsalSection() {
           {/* Category Tag (Space Mono) */}
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#0D0D0E]/[0.06] border border-[#0D0D0E]/15 w-fit">
             <span className="w-2 h-2 rounded-full bg-[#009E54] animate-pulse" />
-            <span className="font-mono text-xs font-semibold tracking-widest uppercase text-[#0D0D0E]">
+            <span className="font-stedelijk text-xs tracking-widest uppercase text-[#0D0D0E]">
               01 / FUTSAL ARENA
             </span>
           </div>

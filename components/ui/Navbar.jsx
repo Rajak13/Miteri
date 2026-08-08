@@ -6,6 +6,7 @@
  * Theme Modes:
  * - 'green' (Hero & Futsal): Green logo mark (#3CCB6E), green CTA hover (#123D27 + #3CCB6E border).
  * - 'orange' (Basketball): Electric Orange logo mark (#FF5500), electric orange CTA hover (#3A1200 + #FF5500 border).
+ * - 'blue' (Badminton): Court Blue logo mark (#0091D5), blue CTA hover (#002840 + #0091D5 border).
  */
 
 import React, { useState } from 'react';
@@ -15,7 +16,7 @@ const NAV_LINKS = [
   { label: 'Futsal',      href: '#futsal-section' },
   { label: 'Basketball',  href: '#basketball-section' },
   { label: 'Gym Hall',    href: '#basketball-section' },
-  { label: 'Badminton',   href: '#futsal-section' },
+  { label: 'Badminton',   href: '#badminton-section' },
   { label: 'About',       href: '#hero-section' },
 ];
 
@@ -23,9 +24,12 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isOrange = theme === 'orange';
+  const isBlue   = theme === 'blue';
 
-  const accentColor = isOrange ? '#FF5500' : '#00C864';
-  const ctaHoverBg  = isOrange
+  const accentColor = isBlue ? '#0091D5' : isOrange ? '#FF5500' : '#00C864';
+  const ctaHoverBg  = isBlue
+    ? 'hover:bg-[#002840] hover:border-[#0091D5]/50 hover:text-[#0091D5]'
+    : isOrange
     ? 'hover:bg-[#3A1200] hover:border-[#FF5500]/50 hover:text-[#FF5500]'
     : 'hover:bg-[#0A2E1A] hover:border-[#00C864]/50 hover:text-[#00C864]';
 
@@ -68,7 +72,7 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
               key={link.label}
               href={link.href}
               role="menuitem"
-              className="text-[13px] text-[#85878A] hover:text-[#F4F4F0] transition-colors duration-150 font-sans tracking-tight"
+              className="text-[11px] text-[#85878A] hover:text-[#F4F4F0] transition-colors duration-150 font-mono tracking-widest uppercase"
             >
               {link.label}
             </a>
@@ -79,7 +83,7 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
         <div className="flex items-center gap-4">
           <button
             onClick={onBookNow}
-            className={`hidden md:flex items-center gap-1.5 text-[13px] font-sans text-[#F4F4F0] bg-[#1A1D1C] border border-[#1A1D1C] ${ctaHoverBg} px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer`}
+            className={`hidden md:flex items-center gap-1.5 text-[11px] font-stedelijk tracking-wide text-[#F4F4F0] bg-[#1A1D1C] border border-[#1A1D1C] ${ctaHoverBg} px-4 py-1.5 rounded-full transition-all duration-300 cursor-pointer`}
           >
             Book a Court
           </button>
@@ -88,7 +92,7 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
           <button
             onClick={onBookNow}
             style={{ color: accentColor }}
-            className="md:hidden text-[12px] font-medium font-sans transition-colors duration-500"
+            className="md:hidden text-[11px] font-stedelijk tracking-wide transition-colors duration-500"
           >
             Book
           </button>
@@ -112,7 +116,7 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
               key={link.label}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="text-[14px] text-[#85878A] hover:text-[#F4F4F0] py-1 font-sans"
+              className="text-[11px] text-[#85878A] hover:text-[#F4F4F0] py-1 font-mono tracking-widest uppercase"
             >
               {link.label}
             </a>
@@ -120,7 +124,7 @@ export default function Navbar({ onBookNow, theme = 'green' }) {
           <button
             onClick={() => { onBookNow?.(); setMobileOpen(false); }}
             style={{ backgroundColor: accentColor }}
-            className="mt-2 w-full text-center text-[#0A0B0D] text-[13px] font-semibold font-sans py-2 rounded-full transition-colors duration-500"
+            className="mt-2 w-full text-center text-[#0A0B0D] text-[11px] font-stedelijk tracking-wide py-2 rounded-full transition-colors duration-500"
           >
             Book a Court
           </button>

@@ -1,38 +1,35 @@
 'use client';
 
 /**
- * Basketball — Studio 3D Basketball Mesh with Centered Geometry Raycasting & Additive Mouse Drag.
- *
- * Raycasting & Interaction Fix:
- * Extracts standaloneMesh directly from GLTF geometry, centers geometry bounding box, and computes
- * vertex normals so R3F raycasting recognizes mouse hover (hand grab cursor) and drag interactions
- * 100% identically to Football.jsx.
+ * Shuttlecock — Full GLTF scene render + merged hit mesh for reliable drag rotation.
+ * shuttlecock.glb has 24 meshes — visual uses cloned scene, interaction uses merged geometry.
  */
 
-import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback } from 'react';
+import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const SCENE_BALL_RADIUS = 0.62;
+const SCENE_HIT_RADIUS = 0.72;
 
-export const Basketball = forwardRef(function Basketball(
+export const Shuttlecock = forwardRef(function Shuttlecock(
   { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true },
   ref
 ) {
   const groupRef = useRef();
   const innerRef = useRef();
   const meshRef  = useRef();
-  const standaloneMeshRef = useRef(null);
+  const hitMeshRef = useRef(null);
 
-  const { scene }          = useGLTF('/models/basketball.glb');
+  const { scene }          = useGLTF('/models/shuttlecock.glb');
   const { invalidate, gl } = useThree();
 
-  const isDragging = useRef(false);
-  const prevMouse  = useRef({ x: 0, y: 0 });
-  const angVel     = useRef({ x: 0, y: 0 });
-  const isCoasting = useRef(false);
-  const pointerEnabledRef = useRef(true);
+  const isDragging        = useRef(false);
+  const prevMouse         = useRef({ x: 0, y: 0 });
+  const angVel            = useRef({ x: 0, y: 0 });
+  const isCoasting        = useRef(false);
+  const pointerEnabledRef = useRef(false);
 
   const dragRotationRef = useRef({ x: 0, y: 0 });
   const baseRotationRef = useRef({ x: 0, y: Math.PI, z: 0 });
@@ -120,49 +117,90 @@ export const Basketball = forwardRef(function Basketball(
 
   const onPointerLeave = useCallback(() => {
     if (!isDragging.current) gl.domElement.style.cursor = '';
-  }, [gl, spinEnabled]);
+  }, [gl]);
 
-  // Extract single centered mesh for 100% accurate R3F raycasting
-  const { standaloneMesh, baseScale, materialsRef } = useMemo(() => {
-    let rawMesh = null;
-    scene.traverse((child) => {
-      if (child.isMesh && !rawMesh) {
-        rawMesh = child;
+  const { standaloneObject, hitMesh, baseScale, materialsRef } = useMemo(() => {
+    const clonedScene = scene.clone(true);
+    scene.updateMatrixWorld(true);
+
+    const box = new THREE.Box3().setFromObject(clonedScene);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    clonedScene.position.set(-center.x, -center.y, -center.z);
+
+    const wrapper = new THREE.Group();
+    wrapper.add(clonedScene);
+
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const normScale = (SCENE_HIT_RADIUS * 2) / (maxDim || 1);
+
+    const mats = [];
+    clonedScene.traverse((child) => {
+      if (child.isMesh) {
+        child.raycast = () => null;
+
+        const applyMat = (m) => {
+          const mat = m.clone();
+          mat.envMapIntensity = 2.0;
+          mat.roughness       = 0.32;
+          mat.metalness       = 0.10;
+          mat.transparent     = opacity < 0.99;
+          mat.opacity         = opacity;
+          mat.depthWrite      = true;
+          mats.push(mat);
+          return mat;
+        };
+
+        if (Array.isArray(child.material)) {
+          child.material = child.material.map(applyMat);
+        } else if (child.material) {
+          child.material = applyMat(child.material);
+        }
       }
     });
 
-    if (!rawMesh) {
-      return { standaloneMesh: new THREE.Mesh(), baseScale: 1, materialsRef: [] };
+    // Merged geometry for accurate raycasting (matches Basketball/Football pattern)
+    const sourceMeshes = [];
+    scene.traverse((child) => {
+      if (child.isMesh) sourceMeshes.push(child);
+    });
+
+    let interactionMesh = new THREE.Mesh();
+    if (sourceMeshes.length > 0) {
+      const geoms = sourceMeshes.map((mesh) => {
+        const geom = mesh.geometry.clone();
+        geom.applyMatrix4(mesh.matrixWorld);
+        geom.translate(-center.x, -center.y, -center.z);
+        return geom;
+      });
+      const merged = mergeGeometries(geoms, false);
+      geoms.forEach((g) => g.dispose());
+      if (merged) {
+        merged.computeBoundingBox();
+        merged.computeVertexNormals();
+        const hitMat = new THREE.MeshStandardMaterial({
+          transparent: true,
+          opacity: 0,
+          depthWrite: false,
+        });
+        interactionMesh = new THREE.Mesh(merged, hitMat);
+        interactionMesh.raycast = () => null;
+      }
     }
 
-    const geom = rawMesh.geometry.clone();
-    geom.computeBoundingBox();
-    const box = geom.boundingBox;
-    const center = new THREE.Vector3();
-    box.getCenter(center);
-    geom.translate(-center.x, -center.y, -center.z);
-    geom.computeBoundingBox();
-    geom.computeVertexNormals();
-
-    const size = new THREE.Vector3();
-    geom.boundingBox.getSize(size);
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const normScale = (SCENE_BALL_RADIUS * 2) / (maxDim || 1);
-
-    const mat = rawMesh.material ? rawMesh.material.clone() : new THREE.MeshStandardMaterial();
-    mat.emissiveMap = null;
-    mat.emissive = new THREE.Color(0x000000);
-    mat.emissiveIntensity = 0.0;
-    mat.depthWrite = true;
-    mat.transparent = opacity < 0.99;
-    mat.opacity = opacity;
-    mat.roughness = 0.38;
-    mat.metalness = 0.08;
-
-    const mesh = new THREE.Mesh(geom, mat);
-    standaloneMeshRef.current = mesh;
-    return { standaloneMesh: mesh, baseScale: normScale, materialsRef: [mat] };
+    return {
+      standaloneObject: wrapper,
+      hitMesh: interactionMesh,
+      baseScale: normScale,
+      materialsRef: mats,
+    };
   }, [scene, opacity]);
+
+  useEffect(() => {
+    hitMeshRef.current = hitMesh;
+  }, [hitMesh]);
 
   useImperativeHandle(ref, () => ({
     group: groupRef.current,
@@ -178,13 +216,11 @@ export const Basketball = forwardRef(function Basketball(
       });
     },
     setVisible: (vis) => {
-      if (groupRef.current) {
-        groupRef.current.visible = vis;
-      }
+      if (groupRef.current) groupRef.current.visible = vis;
     },
     setPointerEnabled: (enabled) => {
       pointerEnabledRef.current = enabled;
-      const mesh = standaloneMeshRef.current;
+      const mesh = hitMeshRef.current;
       if (mesh) {
         mesh.raycast = enabled
           ? THREE.Mesh.prototype.raycast
@@ -193,24 +229,26 @@ export const Basketball = forwardRef(function Basketball(
     },
     isDragging: () => isDragging.current,
     isCoasting: () => isCoasting.current,
-  }), [materialsRef, updateCombinedRotation]);
+  }), [materialsRef, updateCombinedRotation, hitMesh]);
 
   return (
     <group ref={groupRef} position={position}>
       <group ref={innerRef} position={[0, 0, 0]} rotation={[0, Math.PI, 0]}>
         <group ref={meshRef}>
-          <primitive
-            object={standaloneMesh}
-            scale={baseScale * scale}
-            onPointerDown={onPointerDown}
-            onPointerEnter={onPointerEnter}
-            onPointerLeave={onPointerLeave}
-          />
+          <group scale={baseScale * scale}>
+            <primitive object={standaloneObject} />
+            <primitive
+              object={hitMesh}
+              onPointerDown={onPointerDown}
+              onPointerEnter={onPointerEnter}
+              onPointerLeave={onPointerLeave}
+            />
+          </group>
         </group>
       </group>
     </group>
   );
 });
 
-useGLTF.preload('/models/basketball.glb');
-export default Basketball;
+useGLTF.preload('/models/shuttlecock.glb');
+export default Shuttlecock;

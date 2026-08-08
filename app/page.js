@@ -7,6 +7,7 @@ import Navbar from '../components/ui/Navbar';
 import HeroKickSequence from '../components/sections/HeroKickSequence';
 import FutsalSection from '../components/sections/FutsalSection';
 import BasketballSection from '../components/sections/BasketballSection';
+import BadmintonSection from '../components/sections/BadmintonSection';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -34,26 +35,39 @@ export default function Home() {
     };
   }, [isUnlocked]);
 
-  // ScrollTrigger for dynamic Navbar theme transition ('green' -> 'orange')
+  // ScrollTrigger for dynamic Navbar theme: green → orange → blue
   useEffect(() => {
     if (!isUnlocked || typeof window === 'undefined') return;
 
-    let st = null;
+    let stOrange = null;
+    let stBlue = null;
     const timer = setTimeout(() => {
-      const el = document.getElementById('basketball-section');
-      if (!el) return;
+      const bballEl = document.getElementById('basketball-section');
+      const badmEl  = document.getElementById('badminton-section');
 
-      st = ScrollTrigger.create({
-        trigger: el,
-        start: 'top 50%',
-        onEnter: () => setNavTheme('orange'),
-        onLeaveBack: () => setNavTheme('green'),
-      });
+      if (bballEl) {
+        stOrange = ScrollTrigger.create({
+          trigger: bballEl,
+          start: 'top 50%',
+          onEnter: () => setNavTheme('orange'),
+          onLeaveBack: () => setNavTheme('green'),
+        });
+      }
+
+      if (badmEl) {
+        stBlue = ScrollTrigger.create({
+          trigger: badmEl,
+          start: 'top 50%',
+          onEnter: () => setNavTheme('blue'),
+          onLeaveBack: () => setNavTheme('orange'),
+        });
+      }
     }, 200);
 
     return () => {
       clearTimeout(timer);
-      if (st) st.kill();
+      if (stOrange) stOrange.kill();
+      if (stBlue) stBlue.kill();
     };
   }, [isUnlocked]);
 
@@ -87,6 +101,7 @@ export default function Home() {
       <div className={`transition-opacity duration-700 ${isUnlocked ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <FutsalSection />
         <BasketballSection />
+        <BadmintonSection />
       </div>
     </main>
   );
