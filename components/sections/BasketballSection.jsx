@@ -27,7 +27,23 @@ export default function BasketballSection() {
     if (!el) return;
 
     const ctx = gsap.context(() => {
-      // 1. Smooth reveal animation for content elements upon entering viewport
+      // 1. ScrollTrigger background color transition from Futsal light (#F4F1EA) to Basketball dark (#080909)
+      gsap.fromTo(
+        el,
+        { backgroundColor: '#F4F1EA' },
+        {
+          backgroundColor: '#080909',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            end: 'top 30%',
+            scrub: true,
+          },
+        }
+      );
+
+      // 2. Smooth reveal animation for content elements upon entering viewport
       if (contentRef.current) {
         gsap.fromTo(
           contentRef.current.children,

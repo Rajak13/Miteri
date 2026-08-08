@@ -518,13 +518,13 @@ function ScrollTriggerSetup({ futsalProgressRef, basketballProgressRef, badminto
         });
       }
 
-      // 2. Basketball Section Morph Trigger — original authored scrub range
+      // 2. Basketball Section Morph Trigger — full-section scrub (matches futsal)
       const bballEl = document.getElementById('basketball-section');
       if (bballEl) {
         stBball = ScrollTrigger.create({
           trigger: bballEl,
-          start: 'top 85%',
-          end: 'top 15%',
+          start: 'top 95%',
+          end: 'bottom 85%',
           scrub: true,
           onUpdate: (self) => {
             basketballProgressRef.current = self.progress;
@@ -533,13 +533,13 @@ function ScrollTriggerSetup({ futsalProgressRef, basketballProgressRef, badminto
         });
       }
 
-      // 3. Badminton Section Morph Trigger — same scrub pattern as basketball
+      // 3. Badminton Section Morph Trigger — full-section scrub (matches futsal)
       const badmEl = document.getElementById('badminton-section');
       if (badmEl) {
         stBadm = ScrollTrigger.create({
           trigger: badmEl,
-          start: 'top 85%',
-          end: 'top 15%',
+          start: 'top 95%',
+          end: 'bottom 85%',
           scrub: true,
           onUpdate: (self) => {
             badmintonProgressRef.current = self.progress;

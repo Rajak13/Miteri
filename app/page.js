@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from '../components/ui/Navbar';
+import Footer from '../components/ui/Footer';
 import HeroKickSequence from '../components/sections/HeroKickSequence';
 import FutsalSection from '../components/sections/FutsalSection';
 import BasketballSection from '../components/sections/BasketballSection';
@@ -102,6 +103,11 @@ export default function Home() {
         <FutsalSection />
         <BasketballSection />
         <BadmintonSection />
+      </div>
+
+      {/* Footer — positioned above canvas to prevent shuttlecock bleed */}
+      <div className="relative z-20 bg-[#0D0D0E]">
+        <Footer />
       </div>
     </main>
   );
