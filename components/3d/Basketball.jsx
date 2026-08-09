@@ -9,7 +9,7 @@
  * 100% identically to Football.jsx.
  */
 
-import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback } from 'react';
+import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -17,7 +17,7 @@ import * as THREE from 'three';
 const SCENE_BALL_RADIUS = 0.62;
 
 export const Basketball = forwardRef(function Basketball(
-  { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true },
+  { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true, onLoad },
   ref
 ) {
   const groupRef = useRef();
@@ -27,6 +27,13 @@ export const Basketball = forwardRef(function Basketball(
 
   const { scene }          = useGLTF('/models/basketball.glb');
   const { invalidate, gl } = useThree();
+
+  // Signal when model is loaded
+  useEffect(() => {
+    if (scene && onLoad) {
+      onLoad();
+    }
+  }, [scene, onLoad]);
 
   const isDragging = useRef(false);
   const prevMouse  = useRef({ x: 0, y: 0 });

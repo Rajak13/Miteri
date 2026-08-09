@@ -14,7 +14,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 const SCENE_HIT_RADIUS = 0.72;
 
 export const Shuttlecock = forwardRef(function Shuttlecock(
-  { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true },
+  { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true, onLoad },
   ref
 ) {
   const groupRef = useRef();
@@ -24,6 +24,13 @@ export const Shuttlecock = forwardRef(function Shuttlecock(
 
   const { scene }          = useGLTF('/models/shuttlecock.glb');
   const { invalidate, gl } = useThree();
+
+  // Signal when model is loaded
+  useEffect(() => {
+    if (scene && onLoad) {
+      onLoad();
+    }
+  }, [scene, onLoad]);
 
   const isDragging        = useRef(false);
   const prevMouse         = useRef({ x: 0, y: 0 });

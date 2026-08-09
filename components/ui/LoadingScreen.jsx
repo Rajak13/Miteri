@@ -1,11 +1,25 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Circle } from 'lucide-react';
 
-export default function LoadingScreen() {
+export default function LoadingScreen({ progress = 0 }) {
+  const [displayProgress, setDisplayProgress] = useState(0);
+  
+  useEffect(() => {
+    // Smoothly animate progress
+    const interval = setInterval(() => {
+      setDisplayProgress(prev => {
+        if (prev >= progress) return prev;
+        return Math.min(prev + 2, progress);
+      });
+    }, 30);
+    
+    return () => clearInterval(interval);
+  }, [progress]);
+
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#F2EFE9]">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#F2EFE9] transition-opacity duration-500">
       <div className="flex flex-col items-center gap-6">
         {/* Animated Football Icon */}
         <div className="relative">
@@ -25,12 +39,18 @@ export default function LoadingScreen() {
             Loading Experience
           </p>
           
-          {/* Progress dots */}
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <div className="w-2 h-2 rounded-full bg-[#00C864] animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 rounded-full bg-[#00C864] animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 rounded-full bg-[#00C864] animate-bounce" style={{ animationDelay: '300ms' }} />
+          {/* Progress bar */}
+          <div className="w-48 h-1 bg-[#0D0D0E]/10 rounded-full mt-4 overflow-hidden">
+            <div 
+              className="h-full bg-[#00C864] transition-all duration-300 ease-out"
+              style={{ width: `${displayProgress}%` }}
+            />
           </div>
+          
+          {/* Progress percentage */}
+          <p className="font-mono text-[10px] text-[#85878A] mt-2">
+            {Math.round(displayProgress)}%
+          </p>
         </div>
       </div>
     </div>

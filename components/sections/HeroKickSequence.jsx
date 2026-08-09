@@ -247,8 +247,49 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
   const [showLayout,       setShowLayout]       = useState(false);
   const [darkTheme,        setDarkTheme]        = useState(false);
   const [modelsLoaded,     setModelsLoaded]     = useState(false);
+  const [loadingProgress,  setLoadingProgress]  = useState(0);
 
   useEffect(() => { setMounted(true); }, []);
+
+  // Simulate loading progress while waiting for models
+  useEffect(() => {
+    if (modelsLoaded) {
+      setLoadingProgress(100);
+      return;
+    }
+
+    // Fake progress that slows down as it approaches 90%
+    const interval = setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev >= 90) return prev; // Wait at 90% for actual model loading
+        const increment = (90 - prev) * 0.1; // Logarithmic slowdown
+        return Math.min(prev + increment, 90);
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [modelsLoaded]);
+
+  // Lock scroll during kick sequence (until layout is shown)
+  useEffect(() => {
+    if (hasKicked && !showLayout) {
+      // Prevent scrolling during animation
+      const scrollY = window.scrollY;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      
+      return () => {
+        // Restore scrolling
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [hasKicked, showLayout]);
 
   // Hide 3D canvas when scrolling past gym section into footer
   useEffect(() => {
@@ -345,7 +386,7 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
     <section id="hero-section" className={`relative w-full h-[100svh] overflow-hidden transition-colors duration-1000 ${
       darkTheme ? 'bg-[#080b08]' : 'bg-[#F2EFE9]'
     }`}>
-      {!modelsLoaded && <LoadingScreen />}
+      {!modelsLoaded && <LoadingScreen progress={loadingProgress} />}
 
       {!hasKicked && <EntryBackground />}
 

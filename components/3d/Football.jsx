@@ -4,7 +4,7 @@
  * Football — Studio 3D Football Mesh with Additive Mouse Drag Rotation Layer & Visibility Controls.
  */
 
-import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback } from 'react';
+import React, { forwardRef, useImperativeHandle, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -13,7 +13,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 const SCENE_BALL_RADIUS = 0.65;
 
 export const Football = forwardRef(function Football(
-  { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true },
+  { position = [0, 0, 0], scale = 1.0, opacity = 1.0, spinEnabled = true, onLoad },
   ref
 ) {
   const groupRef = useRef();
@@ -23,6 +23,13 @@ export const Football = forwardRef(function Football(
 
   const { scene }          = useGLTF('/models/football.glb');
   const { invalidate, gl } = useThree();
+
+  // Signal when model is loaded
+  useEffect(() => {
+    if (scene && onLoad) {
+      onLoad();
+    }
+  }, [scene, onLoad]);
 
   const isDragging      = useRef(false);
   const prevMouse       = useRef({ x: 0, y: 0 });

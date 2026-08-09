@@ -9,7 +9,7 @@
  * - When bmp > 0.001 (Badminton section): Basketball cross-fades out, Shuttlecock becomes visible and rotatable.
  */
 
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useRef, useCallback } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -809,16 +809,27 @@ export default function HeroCanvas({
   const shuttlecockRef = useRef(null);
   const dumbbellRef = useRef(null);
 
-  // Signal when models are loaded
-  useEffect(() => {
-    if (onModelsLoaded) {
-      // Small delay to ensure all models are ready
-      const timer = setTimeout(() => {
-        onModelsLoaded();
-      }, 100);
-      return () => clearTimeout(timer);
+  // Track model loading with refs
+  const loadedModels = useRef({
+    football: false,
+    basketball: false,
+    shuttlecock: false,
+    dumbbell: false,
+  });
+
+  // Check if all models are loaded
+  const checkAllModelsLoaded = useCallback(() => {
+    const allLoaded = Object.values(loadedModels.current).every(Boolean);
+    if (allLoaded && onModelsLoaded) {
+      onModelsLoaded();
     }
   }, [onModelsLoaded]);
+
+  // Signal when individual models load
+  const handleModelLoad = useCallback((modelName) => {
+    loadedModels.current[modelName] = true;
+    checkAllModelsLoaded();
+  }, [checkAllModelsLoaded]);
 
   return (
     <Canvas
@@ -909,6 +920,7 @@ export default function HeroCanvas({
         position={[0, -0.15, 0]}
         scale={1.0}
         spinEnabled={spinEnabled}
+        onLoad={() => handleModelLoad('football')}
       />
 
       {/* 3D Basketball Mesh (Morph Target) */}
@@ -918,6 +930,7 @@ export default function HeroCanvas({
         scale={1.0}
         opacity={0.0}
         spinEnabled={spinEnabled}
+        onLoad={() => handleModelLoad('basketball')}
       />
 
       {/* 3D Shuttlecock Mesh (Morph Target) */}
@@ -927,6 +940,7 @@ export default function HeroCanvas({
         scale={1.0}
         opacity={0.0}
         spinEnabled={spinEnabled}
+        onLoad={() => handleModelLoad('shuttlecock')}
       />
 
       {/* Ambient 3D Dust Particles */}
@@ -939,6 +953,7 @@ export default function HeroCanvas({
         scale={1.0}
         opacity={0.0}
         spinEnabled={spinEnabled}
+        onLoad={() => handleModelLoad('dumbbell')}
       />
     </Canvas>
   );
