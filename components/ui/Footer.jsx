@@ -1,17 +1,12 @@
 'use client';
-
 import React, { useState } from 'react';
-
 export default function Footer() {
   const [creditsOpen, setCreditsOpen] = useState(false);
-
   return (
     <footer className="relative z-50 bg-[#0D0D0E] text-[#85878A] py-8 px-6 pointer-events-auto">
       <div className="max-w-7xl mx-auto pointer-events-auto">
-        
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          
           {/* About Section */}
           <div>
             <h3 className="text-[#F4F4F0] font-humane font-bold text-base uppercase mb-2">
@@ -21,7 +16,6 @@ export default function Footer() {
               Dharan's premier indoor sports arena offering futsal, basketball, badminton, and gym facilities.
             </p>
           </div>
-
           {/* Quick Links */}
           <div>
             <h3 className="text-[#F4F4F0] font-sans font-semibold text-xs uppercase tracking-wider mb-2">
@@ -50,7 +44,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
           {/* Contact Info */}
           <div>
             <h3 className="text-[#F4F4F0] font-sans font-semibold text-xs uppercase tracking-wider mb-2">
@@ -67,10 +60,8 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-
         {/* Divider */}
         <div className="border-t border-[#2A2A2A] my-4"></div>
-
         {/* 3D Model Credits Section - Dropdown */}
         <div className="mb-4">
           <button
@@ -87,7 +78,6 @@ export default function Footer() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          
           <div className={`overflow-hidden transition-all duration-300 ${creditsOpen ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
             <div className="space-y-1.5 text-[10px] leading-relaxed">
               <p>
@@ -181,7 +171,6 @@ export default function Footer() {
             </div>
           </div>
         </div>
-
         {/* Bottom Bar */}
         <div className="border-t border-[#2A2A2A] pt-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-[10px]">
@@ -212,7 +201,6 @@ export default function Footer() {
             </div>
           </div>
         </div>
-
       </div>
     </footer>
   );

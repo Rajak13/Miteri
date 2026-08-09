@@ -106,6 +106,29 @@ h1, h2, h3, h4, h5, h6 {
   hyphens: none;
   -webkit-hyphens: none;
   -moz-hyphens: none;
+  max-width: 100%;
+}
+
+/* Mobile-specific headline fixes - ONLY for section headlines, not footer */
+@media (max-width: 768px) {
+  /* Target only section headlines (those with AnimatedText) */
+  section h1,
+  section h2,
+  section h3 {
+    word-break: normal;
+    overflow-wrap: break-word;
+    white-space: normal;
+    /* Prevent single-word orphans */
+    orphans: 2;
+    widows: 2;
+    /* Slightly smaller on mobile to fit better */
+    font-size: min(14vw, 3.5rem) !important;
+  }
+  
+  /* Tighter letter spacing on mobile for large display text only */
+  section .font-humane {
+    letter-spacing: -0.025em;
+  }
 }
 
 /* ─── HORIZONTAL RULE ───────────────────────────────────────────── */

@@ -101,10 +101,10 @@ export default function FutsalSection({ onBookNow }) {
             animation="slideUp"
             stagger={0.015}
             duration={0.7}
-            className="font-humane font-bold uppercase text-[#0D0D0E] leading-[0.82] tracking-[-0.01em]"
+            className="font-humane font-bold uppercase text-[#0D0D0E] leading-[0.82] tracking-[-0.01em] max-w-[900px]"
             style={{ fontSize: 'clamp(3.2rem, 6.8vw, 6.0rem)' }}
           >
-            FIFA-Grade Turf.{' '}Built for Match Day.
+            FIFA-Grade Turf. Match-Ready.
           </AnimatedText>
 
           {/* Compact Feature Badges (Space Mono) */}

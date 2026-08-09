@@ -674,7 +674,7 @@ function ScrollTriggerSetup({ futsalProgressRef, basketballProgressRef, badminto
       if (stBadm)   stBadm.kill();
       if (stGym)    stGym.kill();
 
-      // 1. Futsal Section Scroll Trigger — original authored scrub range
+      // 1. Futsal Section Scroll Trigger — bidirectional with proper reset
       const futsalEl = document.getElementById('futsal-section');
       if (futsalEl) {
         stFutsal = ScrollTrigger.create({
@@ -684,6 +684,11 @@ function ScrollTriggerSetup({ futsalProgressRef, basketballProgressRef, badminto
           scrub: true,
           onUpdate: (self) => {
             futsalProgressRef.current = self.progress;
+            invalidate();
+          },
+          onLeaveBack: () => {
+            // Reset when scrolling back past futsal section
+            futsalProgressRef.current = 0;
             invalidate();
           },
         });
@@ -700,7 +705,7 @@ function ScrollTriggerSetup({ futsalProgressRef, basketballProgressRef, badminto
         });
       }
 
-      // 2. Basketball Section Morph Trigger — full-section scrub (matches futsal)
+      // 2. Basketball Section Morph Trigger — bidirectional with reset
       const bballEl = document.getElementById('basketball-section');
       if (bballEl) {
         stBball = ScrollTrigger.create({
@@ -712,10 +717,15 @@ function ScrollTriggerSetup({ futsalProgressRef, basketballProgressRef, badminto
             basketballProgressRef.current = self.progress;
             invalidate();
           },
+          onLeaveBack: () => {
+            // Reset when scrolling back past basketball section
+            basketballProgressRef.current = 0;
+            invalidate();
+          },
         });
       }
 
-      // 3. Badminton Section Morph Trigger — full-section scrub for continuous motion
+      // 3. Badminton Section Morph Trigger — bidirectional with reset
       const badmEl = document.getElementById('badminton-section');
       if (badmEl) {
         stBadm = ScrollTrigger.create({
@@ -727,21 +737,29 @@ function ScrollTriggerSetup({ futsalProgressRef, basketballProgressRef, badminto
             badmintonProgressRef.current = self.progress;
             invalidate();
           },
+          onLeaveBack: () => {
+            // Reset when scrolling back past badminton section
+            badmintonProgressRef.current = 0;
+            invalidate();
+          },
         });
       }
 
-      // 4. Gym Section + Exit — continue until gym section completely leaves viewport
+      // 4. Gym Section + Exit — bidirectional with reset
       const gymEl = document.getElementById('gym-section');
       if (gymEl) {
         stGym = ScrollTrigger.create({
           trigger: gymEl,
           start: 'top 95%',
-          end: 'bottom top',  // Continue until the bottom of gym hits the top of viewport
+          end: 'bottom top',
           scrub: true,
           onUpdate: (self) => {
-            // Raw progress: 0 → 1 as gym scrolls through and exits
-            // This naturally gives us 0-1 for morph + >1 for exit fade
             gymProgressRef.current = self.progress;
+            invalidate();
+          },
+          onLeaveBack: () => {
+            // Reset when scrolling back past gym section
+            gymProgressRef.current = 0;
             invalidate();
           },
         });

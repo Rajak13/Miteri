@@ -101,10 +101,10 @@ export default function GymSection({ onBookNow }) {
             animation="slideUp"
             stagger={0.015}
             duration={0.7}
-            className="font-humane font-bold uppercase text-[#F4F1EA] leading-[0.82] tracking-[-0.01em]"
+            className="font-humane font-bold uppercase text-[#F4F1EA] leading-[0.82] tracking-[-0.01em] max-w-[900px]"
             style={{ fontSize: 'clamp(3.2rem, 6.8vw, 6.0rem)' }}
           >
-            Full Equipment Rig.{' '}Built for Strength.
+            Full Equipment. Built for Strength.
           </AnimatedText>
 
           <ScrollReveal animation="scale" stagger={0.08} delay={0.2} duration={0.5}>

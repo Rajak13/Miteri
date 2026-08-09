@@ -106,10 +106,10 @@ export default function BasketballSection({ onBookNow }) {
             animation="slideUp"
             stagger={0.015}
             duration={0.7}
-            className="font-humane font-bold uppercase text-[#F4F4F0] leading-[0.82] tracking-[-0.01em]"
+            className="font-humane font-bold uppercase text-[#F4F4F0] leading-[0.82] tracking-[-0.01em] max-w-[900px]"
             style={{ fontSize: 'clamp(3.2rem, 6.8vw, 6.0rem)' }}
           >
-            FIBA-Spec Hardwood.{' '}High-Flyer Approved.
+            FIBA-Spec Hardwood. High-Flyer Ready.
           </AnimatedText>
 
           {/* Compact Feature Badges (Space Mono) */}

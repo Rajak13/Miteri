@@ -3,9 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollToPlugin);
 
 /**
  * BackToTop — Section-aware floating button
@@ -14,67 +14,86 @@ gsap.registerPlugin(ScrollTrigger);
  * - Appears after scrolling 500px
  * - Changes color based on current section
  * - Smaller, cleaner design
- * - Smooth scroll to top
+ * - Smooth scroll WITHOUT breaking animations
  */
 
 export default function BackToTop() {
   const [visible, setVisible] = useState(false);
+  const [currentColor, setCurrentColor] = useState({ bg: '#00C864', text: '#0D0D0E' });
   const buttonRef = useRef(null);
   
   useEffect(() => {
     const handleScroll = () => {
-      setVisible(window.scrollY > 500);
+      const scrollY = window.scrollY;
+      setVisible(scrollY > 500);
+      
+      // Manually check which section is in view and update colors
+      // This avoids creating ScrollTriggers that conflict with animation ScrollTriggers
+      const heroEl = document.getElementById('hero-section');
+      const futsalEl = document.getElementById('futsal-section');
+      const basketballEl = document.getElementById('basketball-section');
+      const badmintonEl = document.getElementById('badminton-section');
+      const gymEl = document.getElementById('gym-section');
+      
+      const vh = window.innerHeight;
+      const center = scrollY + vh / 2;
+      
+      // Check which section the center of viewport is in
+      if (gymEl) {
+        const rect = gymEl.getBoundingClientRect();
+        const top = scrollY + rect.top;
+        const bottom = top + gymEl.offsetHeight;
+        if (center >= top && center < bottom) {
+          setCurrentColor({ bg: '#DC2626', text: '#F4F1EA' });
+          return;
+        }
+      }
+      
+      if (badmintonEl) {
+        const rect = badmintonEl.getBoundingClientRect();
+        const top = scrollY + rect.top;
+        const bottom = top + badmintonEl.offsetHeight;
+        if (center >= top && center < bottom) {
+          setCurrentColor({ bg: '#0091D5', text: '#FFFFFF' });
+          return;
+        }
+      }
+      
+      if (basketballEl) {
+        const rect = basketballEl.getBoundingClientRect();
+        const top = scrollY + rect.top;
+        const bottom = top + basketballEl.offsetHeight;
+        if (center >= top && center < bottom) {
+          setCurrentColor({ bg: '#FF6B35', text: '#F4F1EA' });
+          return;
+        }
+      }
+      
+      if (futsalEl) {
+        const rect = futsalEl.getBoundingClientRect();
+        const top = scrollY + rect.top;
+        const bottom = top + futsalEl.offsetHeight;
+        if (center >= top && center < bottom) {
+          setCurrentColor({ bg: '#00C864', text: '#0D0D0E' });
+          return;
+        }
+      }
+      
+      // Default to green (hero/futsal)
+      setCurrentColor({ bg: '#00C864', text: '#0D0D0E' });
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  useEffect(() => {
-    if (!buttonRef.current) return;
-    
-    // Section color mappings
-    const sections = [
-      { selector: '#hero-section', bg: '#00C864', text: '#0D0D0E' },         // Green
-      { selector: '#futsal-section', bg: '#00C864', text: '#0D0D0E' },       // Green
-      { selector: '#basketball-section', bg: '#FF6B35', text: '#F4F1EA' },   // Orange
-      { selector: '#badminton-section', bg: '#0091D5', text: '#FFFFFF' },    // Blue
-      { selector: '#gym-section', bg: '#DC2626', text: '#F4F1EA' },          // Red
-    ];
-    
-    sections.forEach((section) => {
-      ScrollTrigger.create({
-        trigger: section.selector,
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => {
-          gsap.to(buttonRef.current, {
-            backgroundColor: section.bg,
-            color: section.text,
-            duration: 0.4,
-            ease: 'power2.out',
-          });
-        },
-        onEnterBack: () => {
-          gsap.to(buttonRef.current, {
-            backgroundColor: section.bg,
-            color: section.text,
-            duration: 0.4,
-            ease: 'power2.out',
-          });
-        },
-      });
-    });
-    
-    return () => {
-      ScrollTrigger.getAll().forEach(st => st.kill());
-    };
-  }, [visible]);
-  
   const scrollToTop = () => {
-    window.scrollTo({ 
-      top: 0, 
-      behavior: 'smooth' 
+    // Use GSAP for smooth scroll that doesn't break animations
+    gsap.to(window, {
+      scrollTo: { y: 0, autoKill: false },
+      duration: 1.2,
+      ease: 'power2.inOut',
     });
   };
   
@@ -85,7 +104,11 @@ export default function BackToTop() {
       ref={buttonRef}
       onClick={scrollToTop}
       className="cursor-hover fixed bottom-6 right-6 w-11 h-11 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 z-50 group"
-      style={{ backgroundColor: '#00C864', color: '#0D0D0E' }}
+      style={{ 
+        backgroundColor: currentColor.bg, 
+        color: currentColor.text,
+        transition: 'background-color 0.4s ease, color 0.4s ease'
+      }}
       aria-label="Scroll to top"
     >
       <ArrowUp size={18} strokeWidth={2.5} className="group-hover:-translate-y-0.5 transition-transform duration-300" />
