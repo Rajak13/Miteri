@@ -9,8 +9,10 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { ArrowUpRight } from 'lucide-react';
 import ContourLines from '../ui/ContourLines';
+import MagneticButton from '../ui/MagneticButton';
+import AnimatedText from '../ui/AnimatedText';
+import ScrollReveal, { RevealItem } from '../ui/ScrollReveal';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -18,7 +20,7 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function GymSection() {
+export default function GymSection({ onBookNow }) {
   const sectionRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -83,53 +85,64 @@ export default function GymSection() {
       <div className="w-full max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 lg:gap-10 items-center">
         {/* Left 7 Columns: Gym section content */}
         <div ref={contentRef} className="col-span-12 md:col-span-7 flex flex-col justify-center gap-4 sm:gap-6 z-10 pr-0 lg:pr-4">
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#B91C1C]/10 border border-[#B91C1C]/25 w-fit">
-            <span className="w-2 h-2 rounded-full bg-[#B91C1C] animate-pulse" />
-            <span className="font-stedelijk text-xs tracking-widest uppercase text-[#DC2626]">
-              04 / FITNESS CENTER
-            </span>
-          </div>
+          <ScrollReveal animation="fadeUp" delay={0.1} duration={0.6}>
+            <RevealItem>
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#B91C1C]/10 border border-[#B91C1C]/25 w-fit">
+                <span className="w-2 h-2 rounded-full bg-[#B91C1C] animate-pulse" />
+                <span className="font-stedelijk text-xs tracking-widest uppercase text-[#DC2626]">
+                  04 / FITNESS CENTER
+                </span>
+              </div>
+            </RevealItem>
+          </ScrollReveal>
 
-          <h2
+          <AnimatedText
+            as="h2"
+            animation="slideUp"
+            stagger={0.015}
+            duration={0.7}
             className="font-humane font-bold uppercase text-[#F4F1EA] leading-[0.82] tracking-[-0.01em]"
             style={{ fontSize: 'clamp(3.2rem, 6.8vw, 6.0rem)' }}
           >
-            Full Equipment Rig.<br />
-            <span className="text-[#DC2626]">Built for Strength.</span>
-          </h2>
+            Full Equipment Rig.{' '}Built for Strength.
+          </AnimatedText>
 
-          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[#F4F1EA]">
+          <ScrollReveal animation="scale" stagger={0.08} delay={0.2} duration={0.5}>
             {[
               'Free Weights',
               'Power Racks',
               'Cardio Zone',
               'Open 6AM',
             ].map((badge) => (
-              <span
-                key={badge}
-                className="bg-[#B91C1C]/[0.12] border border-[#B91C1C]/25 px-3 sm:px-3.5 py-1.5 rounded-full font-medium text-[11px] sm:text-xs"
-              >
-                {badge}
-              </span>
+              <RevealItem key={badge}>
+                <span className="inline-block bg-[#B91C1C]/[0.12] border border-[#B91C1C]/25 px-3 sm:px-3.5 py-1.5 rounded-full font-medium text-[11px] sm:text-xs font-mono text-[#F4F1EA] mr-2 mb-2">
+                  {badge}
+                </span>
+              </RevealItem>
             ))}
-          </div>
+          </ScrollReveal>
 
-          <p className="font-sans text-xs sm:text-base text-[#C4A8A8] leading-relaxed max-w-[500px]">
-            Modern gym facility equipped with free weights, power racks, cardio machines, and functional training zones. Professional-grade equipment for strength training and conditioning in Dharan.
-          </p>
+          <ScrollReveal animation="fadeUp" delay={0.3} duration={0.7}>
+            <RevealItem>
+              <p className="font-sans text-xs sm:text-base text-[#C4A8A8] leading-relaxed max-w-[500px]">
+                Modern gym facility equipped with free weights, power racks, cardio machines, and functional training zones. Professional-grade equipment for strength training and conditioning in Dharan.
+              </p>
+            </RevealItem>
+          </ScrollReveal>
 
-          <div className="pt-1">
-            <button
-              onClick={() => alert('Opening Miteri Gym Training Session Booking…')}
-              data-magnetic
-              className="group inline-flex items-center gap-3 bg-[#991B1B] hover:bg-[#B91C1C] text-[#F4F1EA] px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-stedelijk text-xs sm:text-sm font-semibold tracking-tight transition-all duration-300 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
-            >
-              <span>Book Training Session</span>
-              <span className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 rounded-full bg-[#F4F1EA] text-[#991B1B] flex items-center justify-center transition-transform duration-300 group-hover:rotate-45 shrink-0">
-                <ArrowUpRight size={14} strokeWidth={2.5} />
-              </span>
-            </button>
-          </div>
+          <ScrollReveal animation="fadeUp" delay={0.4} duration={0.6}>
+            <RevealItem>
+              <div className="pt-1">
+                <MagneticButton
+                  onClick={() => onBookNow?.('gym')}
+                  variant="red"
+                  iconBg="#F4F1EA"
+                >
+                  Book Training Session
+                </MagneticButton>
+              </div>
+            </RevealItem>
+          </ScrollReveal>
         </div>
 
         {/* Right 5 Columns: Reserved space for 3D dumbbell (Desktop right +1.15 X) */}

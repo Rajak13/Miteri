@@ -6,6 +6,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from '../components/ui/Navbar';
 import Footer from '../components/ui/Footer';
 import BookingModal from '../components/ui/BookingModal';
+import SectionTransitions from '../components/ui/SectionTransitions';
+import ScrollProgress from '../components/ui/ScrollProgress';
+import BackToTop from '../components/ui/BackToTop';
 import HeroKickSequence from '../components/sections/HeroKickSequence';
 import FutsalSection from '../components/sections/FutsalSection';
 import BasketballSection from '../components/sections/BasketballSection';
@@ -151,8 +154,22 @@ export default function Home() {
     setBookingOpen(true);
   };
 
+  const handleFacilityBooking = (facility) => {
+    setCurrentFacility(facility);
+    setBookingOpen(true);
+  };
+
   return (
     <main className="min-h-screen bg-[#080909] text-[#0D0D0E]">
+
+      {/* Scroll Progress Bar */}
+      <ScrollProgress />
+
+      {/* Back to Top Button */}
+      <BackToTop />
+
+      {/* Section Transition Manager */}
+      <SectionTransitions />
 
       {/* Booking Modal */}
       <BookingModal
@@ -179,10 +196,10 @@ export default function Home() {
 
       {/* Unlocked Page Sections — Futsal, Basketball, Badminton & Gym Sections */}
       <div className={`transition-opacity duration-700 ${isUnlocked ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <FutsalSection />
-        <BasketballSection />
-        <BadmintonSection />
-        <GymSection />
+        <FutsalSection onBookNow={handleFacilityBooking} />
+        <BasketballSection onBookNow={handleFacilityBooking} />
+        <BadmintonSection onBookNow={handleFacilityBooking} />
+        <GymSection onBookNow={handleFacilityBooking} />
         <Footer />
       </div>
     </main>

@@ -1,5 +1,6 @@
 import "./globals.css";
 import LenisProvider from '../components/LenisProvider';
+import CustomCursor from '../components/ui/CustomCursor';
 import Script from 'next/script';
 
 export const metadata = {
@@ -135,10 +136,6 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body className="min-h-full flex flex-col bg-[#080909] text-[#F4F4F0] font-sans antialiased">
         {/* Structured Data */}
@@ -147,6 +144,9 @@ export default function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
+        
+        {/* Custom Cursor */}
+        <CustomCursor />
         
         <LenisProvider>{children}</LenisProvider>
       </body>

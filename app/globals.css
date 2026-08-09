@@ -73,7 +73,7 @@
   --font-display:       'Humane', sans-serif;
   --font-stedelijk:     'Architype Stedelijk', sans-serif;
   --font-serif:         'Roxborough CF', Georgia, serif;
-  --font-sans:          'Inter', system-ui, sans-serif;
+  --font-sans:          'Roxborough CF', Georgia, serif;
   --font-mono:          'Space Mono', monospace;
 }
 
@@ -93,10 +93,19 @@ html {
 body {
   background-color: var(--bg);
   color: var(--ink);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Roxborough CF', Georgia, serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent text orphans and awkward line breaks in headlines */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  word-break: keep-all;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
 }
 
 /* ─── HORIZONTAL RULE ───────────────────────────────────────────── */
@@ -129,4 +138,169 @@ body {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   display: block;
   overflow: hidden;
+}
+
+
+/* ─── SECTION TRANSITION ENHANCEMENTS ───────────────────────────── */
+/* Smooth color bleed effects and animated borders */
+[id$="-section"] {
+  position: relative;
+  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Gradient bleed overlay at section boundaries */
+.section-transition-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Animated gradient border between sections */
+[id$="-section"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+[id$="-section"]:hover::before {
+  opacity: 1;
+}
+
+/* Smooth scroll behavior for section navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  [id$="-section"],
+  .section-transition-overlay,
+  [id$="-section"]::before {
+    transition: none !important;
+  }
+}
+
+/* ─── CUSTOM CURSOR STYLES ──────────────────────────────────────── */
+/* Hide default cursor on desktop when custom cursor is active */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+  
+  /* But keep cursor for inputs and text areas */
+  input,
+  textarea,
+  [contenteditable] {
+    cursor: text !important;
+  }
+}
+
+/* Ensure custom cursor components are visible */
+.custom-cursor,
+.custom-cursor-follower {
+  pointer-events: none;
+  will-change: transform;
+}
+
+
+/* ─── ANIMATED TEXT CHARACTERS ──────────────────────────────────── */
+/* For kinetic typography animations */
+.char {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* Prevent layout shift during animations */
+.char:empty {
+  width: 0.25em;
+}
+
+/* ─── KINETIC TYPOGRAPHY ANIMATIONS ─────────────────────────────── */
+/* Scroll-triggered letter animations */
+
+@keyframes letterSlideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes letterScale {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes letterRotate {
+  from {
+    transform: rotate(-45deg);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Prevent flash of unstyled content */
+[data-animated-text] {
+  visibility: hidden;
+}
+
+[data-animated-text].initialized {
+  visibility: visible;
+}
+
+/* ─── TEXT SELECTION STYLING ────────────────────────────────────── */
+::selection {
+  background-color: rgba(0, 200, 100, 0.3);
+  color: inherit;
+}
+
+::-moz-selection {
+  background-color: rgba(0, 200, 100, 0.3);
+  color: inherit;
+}
+
+/* ─── FONT RENDERING OPTIMIZATION ───────────────────────────────── */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Optimize font loading */
+@supports (font-display: swap) {
+  @font-face {
+    font-display: swap;
+  }
 }

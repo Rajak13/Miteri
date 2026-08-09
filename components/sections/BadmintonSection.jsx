@@ -9,8 +9,10 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { ArrowUpRight } from 'lucide-react';
 import ContourLines from '../ui/ContourLines';
+import MagneticButton from '../ui/MagneticButton';
+import AnimatedText from '../ui/AnimatedText';
+import ScrollReveal, { RevealItem } from '../ui/ScrollReveal';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -18,7 +20,7 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function BadmintonSection() {
+export default function BadmintonSection({ onBookNow }) {
   const sectionRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -86,53 +88,64 @@ export default function BadmintonSection() {
 
         {/* Right 7 Columns: Badminton section content */}
         <div ref={contentRef} className="col-span-12 md:col-span-7 flex flex-col justify-center gap-4 sm:gap-6 z-10 pl-0 lg:pl-4">
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#0091D5]/10 border border-[#0091D5]/25 w-fit">
-            <span className="w-2 h-2 rounded-full bg-[#0091D5] animate-pulse" />
-            <span className="font-stedelijk text-xs tracking-widest uppercase text-[#0077C8]">
-              03 / BADMINTON ARENA
-            </span>
-          </div>
+          <ScrollReveal animation="fadeUp" delay={0.1} duration={0.6}>
+            <RevealItem>
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#0091D5]/10 border border-[#0091D5]/25 w-fit">
+                <span className="w-2 h-2 rounded-full bg-[#0091D5] animate-pulse" />
+                <span className="font-stedelijk text-xs tracking-widest uppercase text-[#0077C8]">
+                  03 / BADMINTON ARENA
+                </span>
+              </div>
+            </RevealItem>
+          </ScrollReveal>
 
-          <h2
+          <AnimatedText
+            as="h2"
+            animation="slideUp"
+            stagger={0.015}
+            duration={0.7}
             className="font-humane font-bold uppercase text-[#0D0D0E] leading-[0.82] tracking-[-0.01em]"
             style={{ fontSize: 'clamp(3.2rem, 6.8vw, 6.0rem)' }}
           >
-            BWF-Spec Courts.<br />
-            <span className="text-[#0091D5]">Smash-Ready Floors.</span>
-          </h2>
+            BWF-Spec Courts.{' '}Smash-Ready Floors.
+          </AnimatedText>
 
-          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[#0D0D0E]">
+          <ScrollReveal animation="scale" stagger={0.08} delay={0.2} duration={0.5}>
             {[
               '4 Courts',
               'Sprung Maple',
               'Pro Net Systems',
               'Ceiling 12m+',
             ].map((badge) => (
-              <span
-                key={badge}
-                className="bg-[#0091D5]/[0.08] border border-[#0091D5]/20 px-3 sm:px-3.5 py-1.5 rounded-full font-medium text-[11px] sm:text-xs"
-              >
-                {badge}
-              </span>
+              <RevealItem key={badge}>
+                <span className="inline-block bg-[#0091D5]/[0.08] border border-[#0091D5]/20 px-3 sm:px-3.5 py-1.5 rounded-full font-medium text-[11px] sm:text-xs font-mono text-[#0D0D0E] mr-2 mb-2">
+                  {badge}
+                </span>
+              </RevealItem>
             ))}
-          </div>
+          </ScrollReveal>
 
-          <p className="font-sans text-xs sm:text-base text-[#4A6278] leading-relaxed max-w-[500px]">
-            Four regulation indoor badminton courts with BWF-certified sprung flooring, tournament-grade net tension systems, and 12-metre ceiling clearance for competitive play in Dharan.
-          </p>
+          <ScrollReveal animation="fadeUp" delay={0.3} duration={0.7}>
+            <RevealItem>
+              <p className="font-sans text-xs sm:text-base text-[#4A6278] leading-relaxed max-w-[500px]">
+                Four regulation indoor badminton courts with BWF-certified sprung flooring, tournament-grade net tension systems, and 12-metre ceiling clearance for competitive play in Dharan.
+              </p>
+            </RevealItem>
+          </ScrollReveal>
 
-          <div className="pt-1">
-            <button
-              onClick={() => alert('Opening Miteri Badminton Court Booking…')}
-              data-magnetic
-              className="group inline-flex items-center gap-3 bg-[#0077C8] hover:bg-[#0091D5] text-[#FFFFFF] px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-stedelijk text-xs sm:text-sm font-semibold tracking-tight transition-all duration-300 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
-            >
-              <span>Book Badminton Court</span>
-              <span className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 rounded-full bg-[#FFFFFF] text-[#0077C8] flex items-center justify-center transition-transform duration-300 group-hover:rotate-45 shrink-0">
-                <ArrowUpRight size={14} strokeWidth={2.5} />
-              </span>
-            </button>
-          </div>
+          <ScrollReveal animation="fadeUp" delay={0.4} duration={0.6}>
+            <RevealItem>
+              <div className="pt-1">
+                <MagneticButton
+                  onClick={() => onBookNow?.('badminton')}
+                  variant="blue"
+                  iconBg="#FFFFFF"
+                >
+                  Book Badminton Court
+                </MagneticButton>
+              </div>
+            </RevealItem>
+          </ScrollReveal>
         </div>
       </div>
     </section>

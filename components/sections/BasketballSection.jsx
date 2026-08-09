@@ -9,8 +9,10 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { ArrowUpRight } from 'lucide-react';
 import ContourLines from '../ui/ContourLines';
+import MagneticButton from '../ui/MagneticButton';
+import AnimatedText from '../ui/AnimatedText';
+import ScrollReveal, { RevealItem } from '../ui/ScrollReveal';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -18,7 +20,7 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function BasketballSection() {
+export default function BasketballSection({ onBookNow }) {
   const sectionRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -87,57 +89,68 @@ export default function BasketballSection() {
         {/* Left 7 Columns (58.3%): Basketball section content */}
         <div ref={contentRef} className="col-span-12 md:col-span-7 flex flex-col justify-center gap-4 sm:gap-6 z-10 pr-0 lg:pr-4 order-2 md:order-1">
           {/* Category Tag (Space Mono) */}
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#FF5500]/10 border border-[#FF5500]/25 w-fit">
-            <span className="w-2 h-2 rounded-full bg-[#FF5500] animate-pulse" />
-            <span className="font-stedelijk text-xs tracking-widest uppercase text-[#FF5500]">
-              02 / BASKETBALL ARENA
-            </span>
-          </div>
+          <ScrollReveal animation="fadeUp" delay={0.1} duration={0.6}>
+            <RevealItem>
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#FF5500]/10 border border-[#FF5500]/25 w-fit">
+                <span className="w-2 h-2 rounded-full bg-[#FF5500] animate-pulse" />
+                <span className="font-stedelijk text-xs tracking-widest uppercase text-[#FF5500]">
+                  02 / BASKETBALL ARENA
+                </span>
+              </div>
+            </RevealItem>
+          </ScrollReveal>
 
           {/* Display Headline (Humane + #F4F4F0 white text) */}
-          <h2
+          <AnimatedText
+            as="h2"
+            animation="slideUp"
+            stagger={0.015}
+            duration={0.7}
             className="font-humane font-bold uppercase text-[#F4F4F0] leading-[0.82] tracking-[-0.01em]"
             style={{ fontSize: 'clamp(3.2rem, 6.8vw, 6.0rem)' }}
           >
-            FIBA-Spec Hardwood.<br />
-            <span className="text-[#FF5500]">High-Flyer Approved.</span>
-          </h2>
+            FIBA-Spec Hardwood.{' '}High-Flyer Approved.
+          </AnimatedText>
 
           {/* Compact Feature Badges (Space Mono) */}
-          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[#E2E8F0]">
+          <ScrollReveal animation="scale" stagger={0.08} delay={0.2} duration={0.5}>
             {[
               '3 Courts',
               'Maple Hardwood',
               'FIBA Glass Backboards',
               'Shot-Clock Integrated',
             ].map((badge) => (
-              <span
-                key={badge}
-                className="bg-[#FFFFFF]/[0.06] border border-[#FF5500]/20 px-3 sm:px-3.5 py-1.5 rounded-full font-medium text-[#F4F4F0] text-[11px] sm:text-xs"
-              >
-                {badge}
-              </span>
+              <RevealItem key={badge}>
+                <span className="inline-block bg-[#FFFFFF]/[0.06] border border-[#FF5500]/20 px-3 sm:px-3.5 py-1.5 rounded-full font-medium text-[#F4F4F0] text-[11px] sm:text-xs font-mono mr-2 mb-2">
+                  {badge}
+                </span>
+              </RevealItem>
             ))}
-          </div>
+          </ScrollReveal>
 
           {/* Single High-Impact Sentence (Inter font-sans) */}
-          <p className="font-sans text-xs sm:text-base text-[#85878A] leading-relaxed max-w-[520px]">
-            Three indoor regulation basketball courts featuring shock-absorbing maple hardwood, pro-grade FIBA glass backboards, and digital shot-clock integration.
-          </p>
+          <ScrollReveal animation="fadeUp" delay={0.3} duration={0.7}>
+            <RevealItem>
+              <p className="font-sans text-xs sm:text-base text-[#85878A] leading-relaxed max-w-[520px]">
+                Three indoor regulation basketball courts featuring shock-absorbing maple hardwood, pro-grade FIBA glass backboards, and digital shot-clock integration.
+              </p>
+            </RevealItem>
+          </ScrollReveal>
 
           {/* CTA Button (Architype Stedelijk + Electric Orange accent) */}
-          <div className="pt-1">
-            <button
-              onClick={() => alert('Opening Miteri Basketball Court Booking…')}
-              data-magnetic
-              className="group inline-flex items-center gap-3 bg-[#F4F4F0] hover:bg-[#FFFFFF] text-[#0D0D0E] px-5 sm:px-6 py-3 sm:py-3.5 rounded-full font-stedelijk text-xs sm:text-sm font-semibold tracking-tight transition-all duration-300 hover:scale-105 active:scale-95 shadow-md cursor-pointer"
-            >
-              <span>Book Basketball Court</span>
-              <span className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 rounded-full bg-[#FF5500] text-[#FFFFFF] flex items-center justify-center transition-transform duration-300 group-hover:rotate-45 shrink-0">
-                <ArrowUpRight size={14} strokeWidth={2.5} />
-              </span>
-            </button>
-          </div>
+          <ScrollReveal animation="fadeUp" delay={0.4} duration={0.6}>
+            <RevealItem>
+              <div className="pt-1">
+                <MagneticButton
+                  onClick={() => onBookNow?.('basketball')}
+                  variant="outline"
+                  iconBg="#FF5500"
+                >
+                  Book Basketball Court
+                </MagneticButton>
+              </div>
+            </RevealItem>
+          </ScrollReveal>
         </div>
 
         {/* Right 5 Columns (41.6%): Reserved space for 3D Basketball (Desktop right +1.15 X, Mobile top-right +0.30 X, +0.48 Y) */}

@@ -2,7 +2,9 @@
 
 import React, { useState, useRef, useEffect, useCallback, useMemo, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowUpRight, ArrowDown, Dumbbell } from 'lucide-react';
+import { ArrowDown, Dumbbell } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import MagneticButton from '../ui/MagneticButton';
 import gsap from 'gsap';
 import LoadingScreen from '../ui/LoadingScreen';
 
@@ -526,18 +528,17 @@ export default function HeroKickSequence({ onNavbarReveal, onGoalUnlocked }) {
             </p>
 
             <div className="pointer-events-auto">
-              <button
+              <MagneticButton
                 onClick={() => {
                   const el = document.getElementById('futsal-section');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="group inline-flex items-center gap-3 bg-[#00C864] hover:bg-[#1CE47C] text-[#0D0D0E] px-7 py-3.5 rounded-full font-sans text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg cursor-pointer"
+                variant="secondary"
+                size="default"
+                iconBg="#0D0D0E"
               >
-                <span>Explore Facilities</span>
-                <span className="w-5.5 h-5.5 rounded-full bg-[#0D0D0E] text-[#00C864] flex items-center justify-center transition-transform duration-300 group-hover:rotate-45 shrink-0">
-                  <ArrowUpRight size={13} strokeWidth={2.5} />
-                </span>
-              </button>
+                Explore Facilities
+              </MagneticButton>
             </div>
           </div>
         </div>
